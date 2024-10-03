@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getQuotations, createQuotation, getProducts, getSites } from '../../api/api';
+import { getQuotations, createQuotation, getProducts, getSites, getShapes } from '../../api/api';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
@@ -170,7 +170,9 @@ const QuotesPage = () => {
   const [quotes, setQuotes] = useState([]);
   const [products, setProducts] = useState([]);
   const [sites, setSites] = useState([]);
+  const [shapes, setShapes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isShapeSelected, setIsShapeSelected] = useState(false);
   const [newQuote, setNewQuote] = useState({
     product_id: '',
     height: 0,
@@ -178,6 +180,7 @@ const QuotesPage = () => {
     quantity: 1,
     shape: 'A-Flat',
     site_id: '',
+    radius: 60,
   });
 
   // Function to fetch quotes
@@ -210,6 +213,17 @@ const QuotesPage = () => {
     }
   };
 
+  // Function to fetch shapes (when "Shape" is selected)
+  const fetchShapes = async () => {
+    try {
+      const data = await getShapes();
+      console.log("shapes: ", data)
+      setShapes(data);
+    } catch (error) {
+      console.error('Error fetching shapes:', error);
+    }
+  };
+
   useEffect(() => {
     fetchQuotes();
     fetchProducts();
@@ -233,17 +247,37 @@ const QuotesPage = () => {
       quantity: 1,
       shape: 'A-Flat',
       site_id: '',
+      custom_shape: '',
+      radius:60
     });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+  
+    // Check if the shape "Shape" is selected and trigger shape fetching
+    if (name === 'shape') {
+      if (value === 'Shape') {
+        setIsShapeSelected(true);
+        fetchShapes(); // Fetch available shapes when "Shape" is selected
+      } else {
+        setIsShapeSelected(false); // Reset only if not a custom shape
+      }
+    }
+  
+    // Set the newQuote state
     setNewQuote({ ...newQuote, [name]: value });
+  
+    // If the custom_shape is selected, ensure isShapeSelected remains true
+    if (name === 'custom_shape') {
+      setIsShapeSelected(true);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log(newQuote)
       const createdQuote = await createQuotation(newQuote);
       setQuotes([...quotes, createdQuote]);
       handleCloseModal();
@@ -319,17 +353,48 @@ const QuotesPage = () => {
             </Select>
 
             {/* Dropdown for selecting shape */}
-            <label htmlFor="shape">Select Shape:</label>
+            <label htmlFor="shape">Select Design:</label>
             <Select
               name="shape"
               value={newQuote.shape}
               onChange={handleInputChange}
               required
             >
-              <option value="A-Flat">A-Flat</option>
-              <option value="B-Shape">B-Shape</option>
-              <option value="C-Round">C-Round</option>
+              <option value="Flat">Flat</option>
+              <option value="Shape">Shape</option>
+              <option value="Round">Round</option>
             </Select>
+
+            {/* Conditional rendering: Show custom shape dropdown if "Shape" is selected */}
+            {isShapeSelected && (
+              <>
+                <label htmlFor="custom_shape">Select Custom Shape:</label>
+                <Select
+                  name="custom_shape"
+                  value={newQuote.custom_shape}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Select Shape</option>
+                  {shapes.map((shape) => (
+                    <option key={shape} value={shape}>
+                      {shape}
+                    </option>
+                  ))}
+                </Select>
+
+                {/* Input for shape radius with minimum value of 60 */}
+                <label htmlFor="shape_radius">Shape Radius (cm):</label>
+                <Input
+                  type="number"
+                  name="radius"
+                  value={newQuote.radius}
+                  onChange={handleInputChange}
+                  min="60" // Set minimum value to 60
+                  required
+                />
+              </>
+            )}
 
             {/* Input for height */}
             <label htmlFor="height">Height (cm):</label>

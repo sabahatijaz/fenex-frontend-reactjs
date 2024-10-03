@@ -123,4 +123,11 @@ export const getQuotationsBySiteId = async (siteId) => {
     return response.data;
 };
 
+
+// Fetch Shapes
+export const getShapes = async (siteId) => {
+    const response = await api.get(`/shapes`);
+    return response.data;
+};
+
 export default api;
