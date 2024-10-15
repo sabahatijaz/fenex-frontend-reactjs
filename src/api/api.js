@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an Axios instance
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000', // Default to FastAPI port
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://192.168.1.24:8000', // Default to FastAPI port
 });
 
 // Add a request interceptor to include the token in the headers
@@ -111,11 +111,32 @@ export const deleteQuotation = async (quotationId) => {
     return response.data;
 };
 
+export const getLenghtByWidth = async (width) =>{
+    const response = await api.get(`/length-by-width/${width}`)
+    return response.data
+    
+}
+
+export const getWidthByLenght = async (length) =>{
+    const response = await api.get(`/width-by-length/${length}`)
+    return response.data
+}
+
+export const getPossibleLenght = async () =>{
+    const response = await api.get(`/possible-lengths/`)
+    return response.data
+}
+
 // Fetch quotations by user ID
 export const getQuotationsByUserId = async (userId) => {
     const response = await api.get(`/quotations/user/${userId}`);
     return response.data;
 };
+
+
+
+
+
 
 // Fetch quotations by site ID
 export const getQuotationsBySiteId = async (siteId) => {
