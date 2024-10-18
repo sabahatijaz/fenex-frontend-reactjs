@@ -11,7 +11,6 @@ const Sidebar = () => {
         <NavLink to="/quotes">Quotes</NavLink>
         <NavLink to="/canvas">Canvas</NavLink>
        
-        
       </Nav>
       <Footer>
         <p>&copy; 2024 FENEX</p>

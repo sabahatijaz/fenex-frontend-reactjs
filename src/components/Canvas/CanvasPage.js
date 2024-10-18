@@ -8,11 +8,9 @@ const CanvasPage = () => {
   const [isDrawingMode, setIsDrawingMode] = useState(false);
   const [textInput, setTextInput] = useState('');
 
-  
   useEffect(() => {
     fabricCanvas.current = new fabric.Canvas(canvasRef.current);
 
-    
     fabricCanvas.current.on('object:moving', (e) => {
       const obj = e.target;
       if (obj.left < 0) obj.left = 0;
@@ -37,7 +35,6 @@ const CanvasPage = () => {
       }
     });
 
-    
     return () => {
       fabricCanvas.current.dispose();
       fabricCanvas.current = null;
@@ -62,12 +59,11 @@ const CanvasPage = () => {
     };
   };
 
-  // Enable free drawing mode
   const toggleDrawingMode = () => {
     setIsDrawingMode(!isDrawingMode);
     fabricCanvas.current.isDrawingMode = !fabricCanvas.current.isDrawingMode;
   };
-  // Add a circle
+
   const addCircle = () => {
     const circle = new fabric.Circle({
       left: 200,
@@ -80,7 +76,6 @@ const CanvasPage = () => {
     fabricCanvas.current.add(circle);
   };
 
-  // Add a square
   const addSquare = () => {
     const square = new fabric.Rect({
       left: 150,
@@ -94,7 +89,6 @@ const CanvasPage = () => {
     fabricCanvas.current.add(square);
   };
 
-  // Add a triangle
   const addTriangle = () => {
     const triangle = new fabric.Triangle({
       left: 300,
@@ -108,7 +102,6 @@ const CanvasPage = () => {
     fabricCanvas.current.add(triangle);
   };
 
-  // Add text to the canvas
   const addText = () => {
     const text = new fabric.Text(textInput, {
       left: 100,
@@ -120,7 +113,6 @@ const CanvasPage = () => {
     setTextInput(''); 
   };
 
-  // Download the canvas as an image
   const downloadCanvas = () => {
     const dataURL = fabricCanvas.current.toDataURL({
       format: 'png',
@@ -134,49 +126,28 @@ const CanvasPage = () => {
 
   return (
     <div className='contain'>
-      <div style={{ margin: '20px 0' }}>
-        <input
-          type="file"
-          accept="image/*"
-          id="file-input"
-          style={{ display: 'none' }}
-          onChange={handleAddImage}
-        />
-        <label
-          htmlFor="file-input"
-          style={{
-            display: 'inline-block',
-            padding: '12px 24px',
-            background: '#2c3e50',
-            color: '#fff',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            position: 'absolute',
-            top: '75%',
-            left: '5%',
-            textAlign: 'center',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-            transition: 'background 0.3s, transform 0.3s, box-shadow 0.3s',
-            fontWeight: 'bold',
-            fontSize: '16px',
-            border: '2px solid transparent',
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.background = '#34495e';
-            e.currentTarget.style.transform = 'scale(1.05)';
-            e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.3)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.background = '#2c3e50';
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
-          }}
-        >
-          Add Image
-        </label>
-       
+      <div style={{ margin: '20px 0',position: 'absolute', top: '65%',left: '4%', }}>
+        <div className='upload-card'>
+          <input
+            type="file"
+            accept="image/*"
+            id="file-input"
+            style={{ display: 'none' }}
+            onChange={handleAddImage}
+          />
+          <label
+            htmlFor="file-input"
+            className='upload-label'
+          >
+            <div className='upload-content'>
+              <h4>Add Image</h4>
+              <p>Click here to upload an image</p>
+            </div>
+          </label>
+        </div>
       </div>
-      <div style={{position:'sticky',top:'15px'}}>
+
+      <div style={{ position: 'sticky', top: '15px' }}>
         <input
           className='inputfield'
           type="text"
@@ -189,7 +160,7 @@ const CanvasPage = () => {
         <button onClick={addText} className='btn' style={{ marginLeft: '10px' }}>
           Add Text
         </button>
-        <button onClick={toggleDrawingMode} className='btn' style={{ marginLeft: '20px' }}>
+        <button onClick={toggleDrawingMode} className='btn' style={{ marginLeft: '10px' }}>
           {isDrawingMode ? 'Disable Drawing' : 'Enable Drawing'}
         </button>
         <button onClick={addSquare} className='btn' style={{ marginLeft: '10px' }}>
@@ -205,17 +176,14 @@ const CanvasPage = () => {
         <button onClick={downloadCanvas} className='btn' style={{ marginLeft: '10px' }}>
           Download Canvas
         </button>
-        </div>
+      </div>
 
       <div className='container'>
-        <div>
           <canvas
             width='900px'
             height='450px'
             ref={canvasRef}
-            
           />
-        </div>
       </div>
     </div>
   );

@@ -11,7 +11,6 @@ import SignUp from './components/Auth/SignUp';
 import ProfilePage from './components/Profile/ProfilePage';
 import Canvas from './components/Canvas/CanvasPage'
 
-
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Dashboard />} />
@@ -23,8 +22,6 @@ const AppRoutes = () => (
     <Route path="/signup" element={<SignUp />} />
     <Route path="/profile" element={<ProfilePage />} />
     <Route path="/canvas" element={<Canvas />}  />
-    
-    
   </Routes>
 );
 

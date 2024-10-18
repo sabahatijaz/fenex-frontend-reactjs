@@ -1,6 +1,5 @@
 .container {
     display: flex;
-    
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -11,16 +10,9 @@
     margin: 30px;
     margin: auto;
     margin-top: 20px;
-    
-    /* position: relative; */
-    border:'1px solid blue'
+    position: sticky;
+    top: 20px;
   }
-
-.canvas {
-  position: sticky;
-  top: 40px;
-  border:'1px solid red';
-}  
 
 .contain{
   margin-top: 30px;
@@ -40,4 +32,39 @@
   width: 180px;
   padding: 5px;
   font-size: medium;
+}
+
+
+.upload-card {
+  border: 2px dashed #2c3e50;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s, transform 0.3s;
+  cursor: pointer;
+  position: relative;
+  margin: 0 auto;
+  width: 150px; 
+  
+}
+
+.upload-card:hover {
+  background-color: #ecf0f1;
+  transform: scale(1.05);
+}
+
+.upload-label {
+  display: block;
+  color: #2c3e50;
+}
+
+.upload-content h4 {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.upload-content p {
+  margin: 5px 0 0 0;
+  font-size: 0.9em;
 }
