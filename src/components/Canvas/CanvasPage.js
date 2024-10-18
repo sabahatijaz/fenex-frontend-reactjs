@@ -126,7 +126,7 @@ const CanvasPage = () => {
 
   return (
     <div className='contain'>
-      <div style={{ margin: '20px 0',position: 'absolute', top: '65%',left: '4%', }}>
+      <div style={{ margin: '20px 0' ,position:'absolute',top:'65%',left:'2%'}}>
         <div className='upload-card'>
           <input
             type="file"
@@ -160,7 +160,7 @@ const CanvasPage = () => {
         <button onClick={addText} className='btn' style={{ marginLeft: '10px' }}>
           Add Text
         </button>
-        <button onClick={toggleDrawingMode} className='btn' style={{ marginLeft: '10px' }}>
+        <button onClick={toggleDrawingMode} className='btn' style={{ marginLeft: '20px' }}>
           {isDrawingMode ? 'Disable Drawing' : 'Enable Drawing'}
         </button>
         <button onClick={addSquare} className='btn' style={{ marginLeft: '10px' }}>
@@ -184,6 +184,7 @@ const CanvasPage = () => {
             height='450px'
             ref={canvasRef}
           />
+        
       </div>
     </div>
   );
