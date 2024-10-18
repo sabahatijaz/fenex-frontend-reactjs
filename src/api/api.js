@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an Axios instance
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000', // Default to FastAPI port
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://192.168.1.24:8000', // Default to FastAPI port
 });
 
 // Add a request interceptor to include the token in the headers
