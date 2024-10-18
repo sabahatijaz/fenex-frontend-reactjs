@@ -1,7 +1,7 @@
 import React from 'react';
 import { SidebarContainer, Logo, Nav, NavLink, Footer } from './SidebarStyles';
 
-const Sidebar = ({}) => {
+const Sidebar = () => {
   return (
     <SidebarContainer>
       <Logo>FENEX</Logo>
