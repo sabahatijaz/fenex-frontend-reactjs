@@ -1,68 +1,62 @@
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(102, 102, 102);
-    width: 915px;
-    height: 450px;
-    border-radius: 10px;
-    margin: 30px;
-    margin: auto;
-    margin-top: 20px;
-    position: sticky;
-    top: 20px;
-  }
+.canvas-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 100%;
+  margin: 0 auto;
 
-.contain{
-  margin-top: 30px;
-}  
+}
+  
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #666;
+  width: 100%;
+  max-width: 915px;
+  height: 250px;
+  border-radius: 10px;
+  margin: auto;
+}
 
 .btn {
   background-color: aquamarine;
   border-radius: 5px;
-  border:none;
-  padding: 5px 15px;
-
+  border: none;
+  padding: 10px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.inputfield{
+.btn:hover {
+  background-color: #00cc99;
+}
+
+.inputfield {
   border: none;
   border-radius: 5px;
-  width: 180px;
-  padding: 5px;
+  padding: 10px;
   font-size: medium;
 }
 
-.upload-card {
-  border: 2px solid #2c3e50;
-  border-radius: 10px;
-  padding: 20px;
-  text-align: center;
-  background-color: #f9f9f9;
-  transition: background-color 0.3s, transform 0.3s;
-  cursor: pointer;
-  position: relative;
-  margin: 0 auto;
-  width: 200px; 
-}
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: center;
+  }
 
-.upload-card:hover {
-  background-color: #ecf0f1;
-  transform: scale(1.05);
-}
-
-.upload-label {
-  display: block;
-  color: #2c3e50;
-}
-
-.upload-content h4 {
-  margin: 0;
-  font-size: 1.2em;
-}
-
-.upload-content p {
-  margin: 5px 0 0 0;
-  font-size: 0.9em;
+  .canvas-container {
+    width: 100%;
+    height: auto;
+  }
 }

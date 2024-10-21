@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import * as fabric from 'fabric';
 import './canvasStyle.css';
 
-const CanvasPage = () => {
+const CanvasPage = ({ uploadedImage }) => {
   const canvasRef = useRef(null);
   const fabricCanvas = useRef(null);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
@@ -41,14 +41,10 @@ const CanvasPage = () => {
     };
   }, []);
 
-  const handleAddImage = (e) => {
-    let imgObj = e.target.files[0];
-    let render = new FileReader();
-    render.readAsDataURL(imgObj);
-    render.onload = (event) => {
-      let imageUrl = event.target.result;
+  useEffect(() => {
+    if (uploadedImage) {
       let imageElement = document.createElement('img');
-      imageElement.src = imageUrl;
+      imageElement.src = uploadedImage;
       imageElement.onload = function () {
         let image = new fabric.Image(imageElement);
         fabricCanvas.current.add(image);
@@ -56,8 +52,8 @@ const CanvasPage = () => {
         fabricCanvas.current.setActiveObject(image);
         fabricCanvas.current.renderAll();
       };
-    };
-  };
+    }
+  }, [uploadedImage]);
 
   const toggleDrawingMode = () => {
     setIsDrawingMode(!isDrawingMode);
@@ -110,7 +106,7 @@ const CanvasPage = () => {
       fill: 'black',
     });
     fabricCanvas.current.add(text);
-    setTextInput(''); 
+    setTextInput('');
   };
 
   const downloadCanvas = () => {
@@ -120,71 +116,32 @@ const CanvasPage = () => {
     });
     const link = document.createElement('a');
     link.href = dataURL;
-    link.download = 'canvas.png'; 
+    link.download = 'canvas.png';
     link.click();
   };
 
   return (
-    <div className='contain'>
-      <div style={{ margin: '20px 0' ,position:'absolute',top:'65%',left:'2%'}}>
-        <div className='upload-card'>
-          <input
-            type="file"
-            accept="image/*"
-            id="file-input"
-            style={{ display: 'none' }}
-            onChange={handleAddImage}
-          />
-          <label
-            htmlFor="file-input"
-            className='upload-label'
-          >
-            <div className='upload-content'>
-              <h4>Add Image</h4>
-              <p>Click here to upload an image</p>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div style={{ position: 'sticky', top: '15px' }}>
+    <div className="canvas-page-container">
+      <div className="toolbar">
         <input
-          className='inputfield'
+          className="inputfield"
           type="text"
           value={textInput}
           onChange={(e) => setTextInput(e.target.value)}
           placeholder="Enter text"
-          style={{ marginLeft: '10px', padding: '8px' }}
         />
-        
-        <button onClick={addText} className='btn' style={{ marginLeft: '10px' }}>
-          Add Text
-        </button>
-        <button onClick={toggleDrawingMode} className='btn' style={{ marginLeft: '20px' }}>
+        <button onClick={addText} className="btn">Add Text</button>
+        <button onClick={toggleDrawingMode} className="btn">
           {isDrawingMode ? 'Disable Drawing' : 'Enable Drawing'}
         </button>
-        <button onClick={addSquare} className='btn' style={{ marginLeft: '10px' }}>
-          Add Square
-        </button>
-        <button onClick={addCircle} className='btn' style={{ marginLeft: '10px' }}>
-          Add Circle
-        </button>
-        <button onClick={addTriangle} className='btn' style={{ marginLeft: '10px' }}>
-          Add Triangle
-        </button>
-        
-        <button onClick={downloadCanvas} className='btn' style={{ marginLeft: '10px' }}>
-          Download Canvas
-        </button>
+        <button onClick={addSquare} className="btn">Add Square</button>
+        <button onClick={addCircle} className="btn">Add Circle</button>
+        <button onClick={addTriangle} className="btn">Add Triangle</button>
+        <button onClick={downloadCanvas} className="btn">Download Canvas</button>
       </div>
 
-      <div className='container'>
-          <canvas
-            width='900px'
-            height='450px'
-            ref={canvasRef}
-          />
-        
+      <div className="canvas-container">
+        <canvas width="900px" height="450px" ref={canvasRef} />
       </div>
     </div>
   );
