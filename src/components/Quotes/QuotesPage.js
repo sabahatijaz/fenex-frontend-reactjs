@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { getQuotations, createQuotation, getProducts, getSites, getShapes } from '../../api/api';
+import { getQuotations, createQuotation, getProducts, getSites, getShapes,getWidthByLenght,getLenghtByWidth ,getPossibleLenght } from '../../api/api';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+
+
+
 
 // Style for the parent card
 const ParentCard = styled.div`
@@ -173,15 +176,35 @@ const QuotesPage = () => {
   const [shapes, setShapes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isShapeSelected, setIsShapeSelected] = useState(false);
+  const [lengths, setLengths] = useState([]); 
+  const [widths, setWidths] = useState([]); 
+  const [heights, setHeights] = useState([]); 
+  const [possibleLenght,setPossibleLenght] = useState()
+  const [isWidthDisabled, setIsWidthDisabled] = useState(true);
   const [newQuote, setNewQuote] = useState({
     product_id: '',
     height: 0,
-    width: 0,
+    width: '',
     quantity: 1,
     shape: 'A-Flat',
     site_id: '',
     radius: 60,
   });
+
+
+  
+
+
+  const fetchPossibleLenght = async ()=>{
+    try{
+      const data = await getPossibleLenght()
+      setPossibleLenght(data)
+     
+      
+    } catch (error) {
+      console.error('Error fetching possible lenght:', error);
+    }
+  }
 
   // Function to fetch quotes
   const fetchQuotes = async () => {
@@ -217,17 +240,32 @@ const QuotesPage = () => {
   const fetchShapes = async () => {
     try {
       const data = await getShapes();
-      console.log("shapes: ", data)
       setShapes(data);
     } catch (error) {
       console.error('Error fetching shapes:', error);
     }
   };
 
+  
+
+
+  const fetchHeights = async (length) => {
+    let data;
+    if (length === '100') {
+      data = ['30', '40']; 
+    } else if (length === '200') {
+      data = ['50', '60']; 
+    } else if (length === '300') {
+      data = ['70', '80']; 
+    }
+    setHeights(data);
+  };
+
   useEffect(() => {
     fetchQuotes();
     fetchProducts();
     fetchSites();
+    fetchPossibleLenght()
   }, []);
 
   const handleOpenQuote = (quoteId) => {
@@ -255,24 +293,51 @@ const QuotesPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
   
-    // Check if the shape "Shape" is selected and trigger shape fetching
+    
     if (name === 'shape') {
       if (value === 'Shape') {
         setIsShapeSelected(true);
-        fetchShapes(); // Fetch available shapes when "Shape" is selected
+        fetchShapes(); 
       } else {
-        setIsShapeSelected(false); // Reset only if not a custom shape
+        setIsShapeSelected(false); 
       }
     }
+
+
   
-    // Set the newQuote state
+    
     setNewQuote({ ...newQuote, [name]: value });
   
-    // If the custom_shape is selected, ensure isShapeSelected remains true
+ 
     if (name === 'custom_shape') {
       setIsShapeSelected(true);
     }
+
+  
   };
+
+  const handleGetWidthByLenghtChange = async (e)=>{
+    try{
+      const value=e.target.value
+      setLengths(value)
+      if(value==='selectlenght'){
+        setIsWidthDisabled(true)
+        setWidths([])
+        
+        
+      }
+      
+      const width = await getWidthByLenght(value) 
+      setWidths(width)
+      setIsWidthDisabled(false); 
+      
+      
+    }
+    catch (error) {
+      console.error('Error fetching width:', error);
+    }
+
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -336,7 +401,7 @@ const QuotesPage = () => {
 
 
 
-            {/* Dropdown for selecting product */}
+            
             <label htmlFor="product_id">Select Product:</label>
             <Select
               name="product_id"
@@ -352,7 +417,7 @@ const QuotesPage = () => {
               ))}
             </Select>
 
-            {/* Dropdown for selecting shape */}
+            
             <label htmlFor="shape">Select Design:</label>
             <Select
               name="shape"
@@ -383,18 +448,53 @@ const QuotesPage = () => {
                   ))}
                 </Select>
 
-                {/* Input for shape radius with minimum value of 60 */}
+               
                 <label htmlFor="shape_radius">Shape Radius (cm):</label>
                 <Input
                   type="number"
                   name="radius"
                   value={newQuote.radius}
                   onChange={handleInputChange}
-                  min="60" // Set minimum value to 60
+                  min="60"
                   required
                 />
               </>
             )}
+
+    
+
+
+          <label htmlFor="length">Select Length:</label>
+          <Select
+          required
+           onChange={handleGetWidthByLenghtChange}
+            >
+           <option value="selectlenght">Select Length</option>
+          {Array.isArray(possibleLenght) && possibleLenght.map((length) => (
+           <option key={length} value={length}>
+             {length} cm
+           </option>
+            ))}
+          </Select>
+        
+
+          <label htmlFor="lenght">Select Width:</label>
+          <Select
+           name="width"
+           value={newQuote.width}
+           onChange={handleInputChange}
+           disabled={isWidthDisabled} 
+           required
+         
+           >
+          <option value="">Select Width</option>
+        vvv {widths.map((width) => (
+           <option key={width} value={width}>
+            {width} cm
+           </option>
+          ))}
+          </Select>
+
 
             {/* Input for height */}
             <label htmlFor="height">Height (cm):</label>
@@ -406,17 +506,7 @@ const QuotesPage = () => {
               required
             />
 
-            {/* Input for width */}
-            <label htmlFor="width">Width (cm):</label>
-            <Input
-              type="number"
-              name="width"
-              value={newQuote.width}
-              onChange={handleInputChange}
-              required
-            />
-
-            {/* Input for quantity */}
+          
             <label htmlFor="quantity">Quantity:</label>
             <Input
               type="number"

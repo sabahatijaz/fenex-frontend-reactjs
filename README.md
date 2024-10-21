@@ -1,6 +1,54 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Getting Started
+Follow these steps to set up and run the project locally:
+
+## Step 1: Install Node.js
+The project requires Node.js version 20.18.0 or higher. You can install Node.js using the following command:
+
+## For macOS and Linux:
+If you use nvm (Node Version Manager), run:
+
+bash
+Copy code
+nvm install 20.18.0
+nvm use 20.18.0
+If you don’t have nvm installed, you can install it by following the instructions in the nvm GitHub repository.
+
+## For Windows:
+Download and install Node.js from the official Node.js website. Make sure to download the version that is 20.18.0 or higher.
+
+Verify the installation by running:
+
+
+###  `node -v`
+This will display the installed Node.js version.
+
+## Step 2: Clone the Repository
+Clone the project repository to your local machine using the following command:
+
+
+###  `git clone https://github.com/sabahatijaz/fenex-frontend-reactjs`
+
+
+## Step 3: Install Dependencies
+Navigate to the project directory and install all the necessary Node.js modules by running the following command:
+
+
+###  cd fenex-quotationsystem
+###  `npm install`
+This command will install all dependencies defined in the package.json file, such as React, Axios, MUI, and others.
+
+## Step 4: Run the Project
+Once all dependencies are installed, you can run the project in development mode by executing the following command:
+
+###  `npm start`
+This will start the development server and open the app in your default web browser at [http://localhost:3000]. The page will automatically reload when you make any changes to the source code.
+
+
+
+
+
 
 ## Available Scripts
 
