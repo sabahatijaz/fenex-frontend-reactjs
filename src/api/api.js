@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// Create an Axios instance
+
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://192.168.1.24:8000', // Default to FastAPI port
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000', // Default to FastAPI port
 });
 
-// Add a request interceptor to include the token in the headers
+
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('access_token'); 
     console.log('Token retrieved from localStorage:', token);
@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-// User API calls
+
 export const createUser = async (newUser) => {
     const response = await api.post('/auth/signup', newUser);
     return response.data;
@@ -36,7 +36,7 @@ export const getUserById = async (userId) => {
     return response.data;
 };
 
-// Site API calls
+
 export const createSite = async (site) => {
     console.log("fite: ",site)
     const response = await api.post('/sites/', site);
