@@ -1,0 +1,62 @@
+.canvas-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  max-width: 100%;
+  margin: 0 auto;
+
+}
+  
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #666;
+  width: 100%;
+  max-width: 915px;
+  height: 250px;
+  border-radius: 10px;
+  margin: auto;
+}
+
+.btn {
+  background-color: aquamarine;
+  border-radius: 5px;
+  border: none;
+  padding: 10px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #00cc99;
+}
+
+.inputfield {
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: medium;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .canvas-container {
+    width: 100%;
+    height: auto;
+  }
+}

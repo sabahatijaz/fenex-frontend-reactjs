@@ -9,8 +9,9 @@ import QuoteDetailsPage from './components/Quotes/QuoteDetailsPage';
 import SignIn from './components/Auth/SignIn';
 import SignUp from './components/Auth/SignUp';
 import ProfilePage from './components/Profile/ProfilePage';
+import Canvas from './components/Canvas/CanvasPage'
 
-const AppRoutes = () => (
+const AppRoutes = ({uploadedImage}) => (
   <Routes>
     <Route path="/" element={<Dashboard />} />
     <Route path="/sites" element={<SitesPage />} />
@@ -20,6 +21,7 @@ const AppRoutes = () => (
     <Route path="/signin" element={<SignIn />} />
     <Route path="/signup" element={<SignUp />} />
     <Route path="/profile" element={<ProfilePage />} />
+    <Route path="/canvas" element={<Canvas uploadedImage={uploadedImage} />} /> 
   </Routes>
 );
 
