@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create an Axios instance
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://192.168.1.24:8000', // Default to FastAPI port
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://192.168.1.26:8000', // Default to FastAPI port
 });
 
 // Add a request interceptor to include the token in the headers
@@ -117,13 +117,13 @@ export const getLenghtByWidth = async (width) =>{
     
 }
 
-export const getWidthByLenght = async (length) =>{
-    const response = await api.get(`/width-by-length/${length}`)
+export const getWidthByLenght = async (productId,length) =>{
+    const response = await api.get(`/width-by-length/${productId}/${length}`)
     return response.data
 }
 
-export const getPossibleLenght = async () =>{
-    const response = await api.get(`/possible-lengths/`)
+export const getPossibleLenght = async (product_id) =>{
+    const response = await api.get(`/possible-lengths/${product_id}`)
     return response.data
 }
 
