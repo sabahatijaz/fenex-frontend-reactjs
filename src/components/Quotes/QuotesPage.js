@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { getQuotations, createQuotation, getProducts, getSites, getShapes,getWidthByLenght,getLenghtByWidth ,getPossibleLenght } from '../../api/api';
+import { getQuotations, createQuotation, getProducts, getSites, getShapes,getWidthByLenght,getLenghtByWidth ,getPossibleLenght,getProductById} from '../../api/api';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 
-
-
-// Style for the parent card
 const ParentCard = styled.div`
   padding: 20px;
   width: 100%;
-  max-width: 90vw; /* Maximum width for the card */
-  margin: 0 auto; /* Center horizontally */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add shadow */
-  background-color: #f9f9f9; /* Background color */
+  max-width: 90vw; 
+  margin: 0 auto;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9; 
   border-radius: 10px;
-  min-height: 80vh; /* Minimum height */
+  min-height: 80vh; 
 `;
 
-// Header row with space between label and button
 const HeaderRow = styled.div`
   display: flex;
   justify-content: space-between;
@@ -27,13 +23,11 @@ const HeaderRow = styled.div`
   margin-bottom: 20px;
 `;
 
-// Label for quotations
 const QuotationsLabel = styled.h2`
   margin: 0;
   color: #3b5998;
 `;
 
-// Add New Quote button
 const AddQuoteButton = styled.button`
   background-color: #4caf50;
   color: white;
@@ -50,7 +44,6 @@ const AddQuoteButton = styled.button`
   }
 `;
 
-// Wrapper for the quotes
 const QuotesWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -58,34 +51,32 @@ const QuotesWrapper = styled.div`
   width: 100%;
 `;
 
-// Style for individual quote cards
 const QuoteCard = styled.div`
   background: #f4f4f4;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 15px;
-  width: calc(33.333% - 20px); /* Adjust to fit three items per row */
+  width: calc(33.333% - 20px); 
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition on hover */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
 
-  /* Hover effect */
+
   &:hover {
-    transform: translateY(-5px); /* Slightly lift the card */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Increase shadow */
+    transform: translateY(-5px); 
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
   }
 
-  /* Responsive design for smaller screens */
+
   @media (max-width: 768px) {
-    width: calc(50% - 20px); /* Two items per row */
+    width: calc(50% - 20px); 
   }
 
   @media (max-width: 480px) {
-    width: 100%; /* One item per row */
-  }
+    width: 100%; 
 `;
 
-// Open Quote button within the card
+
 const OpenQuoteButton = styled.button`
   margin-top: 10px;
   padding: 10px;
@@ -103,7 +94,7 @@ const OpenQuoteButton = styled.button`
   }
 `;
 
-// Modal Styles
+
 const modalStyles = {
   content: {
     position: 'relative',
@@ -179,8 +170,10 @@ const QuotesPage = () => {
   const [lengths, setLengths] = useState([]); 
   const [widths, setWidths] = useState([]); 
   const [heights, setHeights] = useState([]); 
-  const [possibleLenght,setPossibleLenght] = useState()
+  const [productId,setProductID] =useState(null)
+  const [possibleLenght,setPossibleLenght] = useState()  
   const [isWidthDisabled, setIsWidthDisabled] = useState(true);
+  const [isLenghtDisabled,setIsLenghtDisabled] = useState(true)
   const [newQuote, setNewQuote] = useState({
     product_id: '',
     height: 0,
@@ -191,22 +184,6 @@ const QuotesPage = () => {
     radius: 60,
   });
 
-
-  
-
-
-  const fetchPossibleLenght = async ()=>{
-    try{
-      const data = await getPossibleLenght()
-      setPossibleLenght(data)
-     
-      
-    } catch (error) {
-      console.error('Error fetching possible lenght:', error);
-    }
-  }
-
-  // Function to fetch quotes
   const fetchQuotes = async () => {
     try {
       const data = await getQuotations();
@@ -216,7 +193,6 @@ const QuotesPage = () => {
     }
   };
 
-  // Function to fetch products
   const fetchProducts = async () => {
     try {
       const data = await getProducts();
@@ -226,7 +202,6 @@ const QuotesPage = () => {
     }
   };
 
-  // Function to fetch sites
   const fetchSites = async () => {
     try {
       const data = await getSites();
@@ -236,7 +211,6 @@ const QuotesPage = () => {
     }
   };
 
-  // Function to fetch shapes (when "Shape" is selected)
   const fetchShapes = async () => {
     try {
       const data = await getShapes();
@@ -245,9 +219,6 @@ const QuotesPage = () => {
       console.error('Error fetching shapes:', error);
     }
   };
-
-  
-
 
   const fetchHeights = async (length) => {
     let data;
@@ -260,13 +231,6 @@ const QuotesPage = () => {
     }
     setHeights(data);
   };
-
-  useEffect(() => {
-    fetchQuotes();
-    fetchProducts();
-    fetchSites();
-    fetchPossibleLenght()
-  }, []);
 
   const handleOpenQuote = (quoteId) => {
     navigate(`/quote/${quoteId}`);
@@ -293,6 +257,7 @@ const QuotesPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
   
+
     
     if (name === 'shape') {
       if (value === 'Shape') {
@@ -302,42 +267,75 @@ const QuotesPage = () => {
         setIsShapeSelected(false); 
       }
     }
-
-
-  
-    
     setNewQuote({ ...newQuote, [name]: value });
   
  
     if (name === 'custom_shape') {
       setIsShapeSelected(true);
+      
     }
 
   
   };
 
-  const handleGetWidthByLenghtChange = async (e)=>{
-    try{
-      const value=e.target.value
-      setLengths(value)
-      if(value==='selectlenght'){
-        setIsWidthDisabled(true)
+  const handleGetWidthByLenghtChange = async (e) => {
+    try {
+      const value = e.target.value;
+      setLengths(value);
+
+      if(value === 'selectlenght'){
         setWidths([])
-        
-        
+        setIsWidthDisabled(true);
       }
-      
-      const width = await getWidthByLenght(value) 
-      setWidths(width)
-      setIsWidthDisabled(false); 
-      
-      
-    }
-    catch (error) {
+  
+      if (productId) {
+        const width = await getWidthByLenght(productId, value);
+        setWidths(width);
+        setIsWidthDisabled(false);
+        
+      } else {
+        console.error('Product ID is not available');
+      }
+    } catch (error) {
       console.error('Error fetching width:', error);
     }
+  };
+  
+  const handleLenghtByProduct = async(e)=>{
+      try{
+        const value = e.target.value
+        setProductID(value)
+        console.log(productId);
+        const productlengths = await getPossibleLenght(value)
+        setPossibleLenght(productlengths)
+        setIsLenghtDisabled(false)
 
+        if(value === 'selectproduct'){
+          setProductID(null)
+          setIsLenghtDisabled(true)
+        }
+      }
+      catch (error) {
+        console.error('Error fetching possible lenghts:', error);
+      }
   }
+
+  useEffect(() => {
+    fetchQuotes();
+    fetchProducts();
+    fetchSites();
+    handleLenghtByProduct()
+
+
+  }, []);
+
+
+  useEffect(() => {
+    fetchQuotes();
+    fetchProducts();
+    fetchSites();
+
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -372,7 +370,7 @@ const QuotesPage = () => {
         </QuotesWrapper>
       </ParentCard>
 
-      {/* Modal for adding new quote */}
+      
       <Modal
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
@@ -383,7 +381,7 @@ const QuotesPage = () => {
         <form onSubmit={handleSubmit}>
           <FormContainer>
             
-            {/* Dropdown for selecting site */}
+         
             <label htmlFor="site_id">Select Site:</label>
             <Select
               name="site_id"
@@ -399,17 +397,14 @@ const QuotesPage = () => {
               ))}
             </Select>
 
-
-
-            
             <label htmlFor="product_id">Select Product:</label>
             <Select
               name="product_id"
               value={newQuote.product_id}
-              onChange={handleInputChange}
+              onChange={handleLenghtByProduct}
               required
             >
-              <option value="">Select Product</option>
+              <option value="selectproduct">Select Product</option>
               {products.map((product) => (
                 <option key={product.id} value={product.id}>
                   {product.product_name}
@@ -417,7 +412,6 @@ const QuotesPage = () => {
               ))}
             </Select>
 
-            
             <label htmlFor="shape">Select Design:</label>
             <Select
               name="shape"
@@ -430,7 +424,6 @@ const QuotesPage = () => {
               <option value="Round">Round</option>
             </Select>
 
-            {/* Conditional rendering: Show custom shape dropdown if "Shape" is selected */}
             {isShapeSelected && (
               <>
                 <label htmlFor="custom_shape">Select Custom Shape:</label>
@@ -447,7 +440,6 @@ const QuotesPage = () => {
                     </option>
                   ))}
                 </Select>
-
                
                 <label htmlFor="shape_radius">Shape Radius (cm):</label>
                 <Input
@@ -461,12 +453,10 @@ const QuotesPage = () => {
               </>
             )}
 
-    
-
-
           <label htmlFor="length">Select Length:</label>
           <Select
           required
+          disabled={isLenghtDisabled}
            onChange={handleGetWidthByLenghtChange}
             >
            <option value="selectlenght">Select Length</option>
@@ -477,7 +467,6 @@ const QuotesPage = () => {
             ))}
           </Select>
         
-
           <label htmlFor="lenght">Select Width:</label>
           <Select
            name="width"
@@ -485,18 +474,15 @@ const QuotesPage = () => {
            onChange={handleInputChange}
            disabled={isWidthDisabled} 
            required
-         
            >
           <option value="">Select Width</option>
-        vvv {widths.map((width) => (
-           <option key={width} value={width}>
+            {widths.map((width) => (
+            <option key={width} value={width}>
             {width} cm
            </option>
           ))}
           </Select>
 
-
-            {/* Input for height */}
             <label htmlFor="height">Height (cm):</label>
             <Input
               type="number"
@@ -506,7 +492,6 @@ const QuotesPage = () => {
               required
             />
 
-          
             <label htmlFor="quantity">Quantity:</label>
             <Input
               type="number"
@@ -522,5 +507,4 @@ const QuotesPage = () => {
     </div>
   );
 };
-
 export default QuotesPage;
