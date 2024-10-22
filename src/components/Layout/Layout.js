@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Sidebar from './Sidebar'; 
 import { Link } from 'react-router-dom';
@@ -6,17 +6,17 @@ import { Link } from 'react-router-dom';
 // Styled components for the layout
 const LayoutContainer = styled.div`
   display: flex;
-  height: 100vh; /* Ensure the layout takes full viewport height */
+  height: 100vh;
   font-family: Arial, sans-serif;
 `;
 
 const ContentContainer = styled.div`
-  flex: 1; /* This allows it to fill the remaining space */
+  flex: 1;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  background-color: #f4f4f4; /* Light background for contrast */
-  overflow-y: auto; /* Allow scrolling for content */
+  background-color: #f4f4f4;
+  overflow-y: auto;
 `;
 
 const Navbar = styled.div`
@@ -26,23 +26,11 @@ const Navbar = styled.div`
   background: linear-gradient(to bottom, #2c3e50, #34495e);
   color: white;
   padding: 10px 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
-  border-radius: 10px; /* Rounded corners */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3); /* More pronounced border */
-  margin: 0 10px; /* Margin to create space from the edges of the page */
-
-  position: relative; /* Ensure positioning context */
-  &:before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: 12px; /* Match or exceed the border-radius */
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
-    z-index: -1;
-  }
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  margin: 0 10px;
+ 
 `;
 
 const NavLinks = styled.div`
@@ -60,9 +48,15 @@ const NavLink = styled(Link)`
 `;
 
 const Layout = ({ children }) => {
+  const [uploadedImage, setUploadedImage] = useState(null);
+
+  const handleImageUpload = (image) => {
+    setUploadedImage(image); 
+  };
+
   return (
     <LayoutContainer>
-      <Sidebar />
+      <Sidebar onImageUpload={handleImageUpload} /> 
       <ContentContainer>
         <Navbar>
           <h1>FENEX</h1>
@@ -70,10 +64,19 @@ const Layout = ({ children }) => {
             <NavLink to="/profile">Profile</NavLink>
             <NavLink to="/signin">Sign In</NavLink>
             <NavLink to="/signup">Sign Up</NavLink>
+            
           </NavLinks>
         </Navbar>
-        <div style={{ flexGrow: 1, overflowY: 'auto' }}> {/* Ensure content is scrollable */}
-          {children}
+        <div style={{ flexGrow: 1,
+          
+          overflowY: 'auto' 
+          }}>
+          
+          {React.Children.map(children, child => 
+            React.isValidElement(child) 
+              ? React.cloneElement(child, { uploadedImage }) 
+              : child
+          )}
         </div>
       </ContentContainer>
     </LayoutContainer>
