@@ -163,8 +163,6 @@ const QuotesPage = () => {
   const navigate = useNavigate();
   const [quotes, setQuotes] = useState([]);
   const [products, setProducts] = useState([]);
-  console.log('products',products);
-  
   const [sites, setSites] = useState([]);
   const [shapes, setShapes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -173,9 +171,7 @@ const QuotesPage = () => {
   const [widths, setWidths] = useState([]); 
   const [heights, setHeights] = useState([]); 
   const [productId,setProductID] =useState(null)
-  const [possibleLenght,setPossibleLenght] = useState()
-  console.log('possible lenght',possibleLenght);
-  
+  const [possibleLenght,setPossibleLenght] = useState()  
   const [isWidthDisabled, setIsWidthDisabled] = useState(true);
   const [isLenghtDisabled,setIsLenghtDisabled] = useState(true)
   const [newQuote, setNewQuote] = useState({
@@ -188,7 +184,6 @@ const QuotesPage = () => {
     radius: 60,
   });
 
-
   const fetchQuotes = async () => {
     try {
       const data = await getQuotations();
@@ -197,7 +192,6 @@ const QuotesPage = () => {
       console.error('Error fetching quotes:', error);
     }
   };
-
 
   const fetchProducts = async () => {
     try {
@@ -208,7 +202,6 @@ const QuotesPage = () => {
     }
   };
 
-
   const fetchSites = async () => {
     try {
       const data = await getSites();
@@ -217,7 +210,6 @@ const QuotesPage = () => {
       console.error('Error fetching sites:', error);
     }
   };
-
 
   const fetchShapes = async () => {
     try {
@@ -228,7 +220,6 @@ const QuotesPage = () => {
     }
   };
 
-  
   const fetchHeights = async (length) => {
     let data;
     if (length === '100') {
@@ -240,7 +231,6 @@ const QuotesPage = () => {
     }
     setHeights(data);
   };
-
 
   const handleOpenQuote = (quoteId) => {
     navigate(`/quote/${quoteId}`);
@@ -484,7 +474,6 @@ const QuotesPage = () => {
            onChange={handleInputChange}
            disabled={isWidthDisabled} 
            required
-         
            >
           <option value="">Select Width</option>
             {widths.map((width) => (
@@ -518,5 +507,4 @@ const QuotesPage = () => {
     </div>
   );
 };
-
 export default QuotesPage;
