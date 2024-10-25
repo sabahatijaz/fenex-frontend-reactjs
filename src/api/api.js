@@ -20,12 +20,6 @@ api.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-
-export const createUser = async (newUser) => {
-    const response = await api.post('/auth/signup', newUser);
-    return response.data;
-};
-
 export const getUsers = async (skip = 0, limit = 10) => {
     const response = await api.get(`/users?skip=${skip}&limit=${limit}`);
     return response.data;
@@ -134,10 +128,6 @@ export const getQuotationsByUserId = async (userId) => {
 };
 
 
-
-
-
-
 // Fetch quotations by site ID
 export const getQuotationsBySiteId = async (siteId) => {
     const response = await api.get(`/quotations/site/${siteId}`);
@@ -150,5 +140,14 @@ export const getShapes = async (siteId) => {
     const response = await api.get(`/shapes`);
     return response.data;
 };
+
+
+export const addQuotations = async (site_id, quotations) => {
+    const response = await api.post(`/quotations/site/${site_id}`, quotations );
+    return response.data;
+};
+
+  
+  
 
 export default api;
