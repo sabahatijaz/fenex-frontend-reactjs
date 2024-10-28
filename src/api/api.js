@@ -20,6 +20,11 @@ api.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
+export const createUser = async (newUser) => {
+    const response = await api.post('/auth/signup', newUser);
+    return response.data;
+};
+
 export const getUsers = async (skip = 0, limit = 10) => {
     const response = await api.get(`/users?skip=${skip}&limit=${limit}`);
     return response.data;
