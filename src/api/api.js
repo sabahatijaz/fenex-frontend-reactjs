@@ -20,7 +20,6 @@ api.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-
 export const createUser = async (newUser) => {
     const response = await api.post('/auth/signup', newUser);
     return response.data;
@@ -64,7 +63,6 @@ export const deleteSite = async (siteId) => {
     return response.data;
 };
 
-// Product API calls
 export const createProduct = async (product) => {
     const response = await api.post('/products/', product);
     return response.data;
@@ -85,7 +83,6 @@ export const deleteProduct = async (productId) => {
     return response.data;
 };
 
-// Quotation API calls
 export const createQuotation = async (quotation) => {
     const response = await api.post('/quotations/', quotation);
     return response.data;
@@ -127,27 +124,23 @@ export const getPossibleLenght = async (product_id) =>{
     return response.data
 }
 
-// Fetch quotations by user ID
 export const getQuotationsByUserId = async (userId) => {
     const response = await api.get(`/quotations/user/${userId}`);
     return response.data;
 };
 
-
-
-
-
-
-// Fetch quotations by site ID
 export const getQuotationsBySiteId = async (siteId) => {
     const response = await api.get(`/quotations/site/${siteId}`);
     return response.data;
 };
 
-
-// Fetch Shapes
 export const getShapes = async (siteId) => {
     const response = await api.get(`/shapes`);
+    return response.data;
+};
+
+export const addQuotations = async (site_id, quotations) => {
+    const response = await api.post(`/quotations/site/${site_id}`, quotations );
     return response.data;
 };
 
