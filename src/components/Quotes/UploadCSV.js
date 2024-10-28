@@ -125,10 +125,6 @@ const UploadCSV = () => {
 
   const handleQuotations = async (quotations) => {
     try {
-      console.log('quotation',quotations);
-      console.log('selectedSite',selectedSite);
-      
-      
       await addQuotations(selectedSite, quotations);
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
