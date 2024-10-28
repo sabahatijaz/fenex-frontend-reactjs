@@ -63,7 +63,6 @@ export const deleteSite = async (siteId) => {
     return response.data;
 };
 
-// Product API calls
 export const createProduct = async (product) => {
     const response = await api.post('/products/', product);
     return response.data;

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import 'tailwindcss/tailwind.css';
-
 import { getSites, addQuotations } from '../../api/api';
+import { faUpload } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 
 const modalStyles = {
   content: {
@@ -67,6 +67,7 @@ const UploadCSV = () => {
                 square_foot: row.square_foot ? parseFloat(row.square_foot) : null,
               }));
   
+            
             if (quotations.length > 0) {
               handleQuotations(quotations);
             } else {
@@ -84,7 +85,7 @@ const UploadCSV = () => {
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
   
           const quotations = jsonData.slice(1)
-            .filter(row => row[0] && row[1] && row[2])
+            .filter(row => row[0] && row[1] && row[2]) 
             .map(row => ({
               site_id: selectedSite,
               product_id: row[0] || null,
@@ -98,6 +99,7 @@ const UploadCSV = () => {
               square_foot: row[8] ? parseFloat(row[8]) : null,
             }));
   
+          
           if (quotations.length > 0) {
             handleQuotations(quotations);
           } else {
@@ -114,6 +116,7 @@ const UploadCSV = () => {
     handleCloseModal();
   };
   
+
   const fetchSites = async () => {
     try {
       const data = await getSites();
@@ -122,6 +125,7 @@ const UploadCSV = () => {
       console.error('Error fetching sites:', error);
     }
   };
+
 
   const handleQuotations = async (quotations) => {
     try {
@@ -144,7 +148,8 @@ const UploadCSV = () => {
         onClick={handleOpenModal}
         className="bg-blue-500 text-white py-2 px-4 rounded-md shadow hover:bg-blue-600 transition"
       >
-        Upload CSV
+        
+        Upload CSV 
         <FontAwesomeIcon icon={faUpload} className="ml-2" />
       </button>
 
@@ -204,3 +209,6 @@ const UploadCSV = () => {
 };
 
 export default UploadCSV;
+
+
+

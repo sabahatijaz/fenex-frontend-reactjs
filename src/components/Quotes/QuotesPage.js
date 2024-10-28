@@ -355,9 +355,11 @@ const QuotesPage = () => {
       <ParentCard>
         <HeaderRow>
           <QuotationsLabel>Quotations</QuotationsLabel>
-          <UploadCSV />
+          <UploadCSV /> 
           <AddQuoteButton onClick={handleAddQuote}>Add New Quote</AddQuoteButton>
+          
         </HeaderRow>
+        
 
         {/* Quotes Section */}
         <QuotesWrapper>
