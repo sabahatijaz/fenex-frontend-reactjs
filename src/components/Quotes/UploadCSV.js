@@ -4,6 +4,9 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import 'tailwindcss/tailwind.css';
 import { getSites, addQuotations } from '../../api/api';
+import { faUpload } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 
 const modalStyles = {
   content: {
@@ -50,11 +53,11 @@ const UploadCSV = () => {
           header: true,
           complete: (results) => {
             const quotations = results.data
-              .filter(row => row.product_id && row.width && row.height) // Filter out invalid rows
+              .filter(row => row.product_id && row.width && row.height) 
               .map(row => ({
                 site_id: selectedSite,  
-                product_id: row.product_id || null, // Replace with null if empty
-                width: row.width ? parseFloat(row.width) : null, // Parse and replace with null if empty
+                product_id: row.product_id || null, 
+                width: row.width ? parseFloat(row.width) : null, 
                 height: row.height ? parseFloat(row.height) : null,
                 shape: row.shape || null,
                 custom_shape: row.custom_shape || null,
@@ -64,7 +67,7 @@ const UploadCSV = () => {
                 square_foot: row.square_foot ? parseFloat(row.square_foot) : null,
               }));
   
-            // Check if there are valid quotations
+            
             if (quotations.length > 0) {
               handleQuotations(quotations);
             } else {
@@ -82,7 +85,7 @@ const UploadCSV = () => {
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
   
           const quotations = jsonData.slice(1)
-            .filter(row => row[0] && row[1] && row[2]) // Ensure product_id, width, and height are valid
+            .filter(row => row[0] && row[1] && row[2]) 
             .map(row => ({
               site_id: selectedSite,
               product_id: row[0] || null,
@@ -96,7 +99,7 @@ const UploadCSV = () => {
               square_foot: row[8] ? parseFloat(row[8]) : null,
             }));
   
-          // Check if there are valid quotations
+          
           if (quotations.length > 0) {
             handleQuotations(quotations);
           } else {
@@ -113,9 +116,6 @@ const UploadCSV = () => {
     handleCloseModal();
   };
   
-  
-  
-  
 
   const fetchSites = async () => {
     try {
@@ -129,10 +129,6 @@ const UploadCSV = () => {
 
   const handleQuotations = async (quotations) => {
     try {
-      console.log('quotation',quotations);
-      console.log('selectedSite',selectedSite);
-      
-      
       await addQuotations(selectedSite, quotations);
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
@@ -152,7 +148,9 @@ const UploadCSV = () => {
         onClick={handleOpenModal}
         className="bg-blue-500 text-white py-2 px-4 rounded-md shadow hover:bg-blue-600 transition"
       >
-        Upload CSV
+        
+        Upload CSV 
+        <FontAwesomeIcon icon={faUpload} className="ml-2" />
       </button>
 
       {showAlert && (
