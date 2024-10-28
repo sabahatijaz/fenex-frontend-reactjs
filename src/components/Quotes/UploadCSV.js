@@ -6,7 +6,8 @@ import 'tailwindcss/tailwind.css';
 import { getSites, addQuotations } from '../../api/api';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { toast, ToastContainer } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css'; 
 
 const modalStyles = {
   content: {
@@ -22,6 +23,30 @@ const modalStyles = {
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
+};
+
+export const showErrorToast = (message) => {
+  toast.error(message, {
+    position: 'bottom-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: 'colored',
+  });
+};
+
+export const showSuccessToast = (message) => {
+  toast.success(message, {
+    position: 'top-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: 'colored',
+  });
 };
 
 const UploadCSV = () => {
@@ -44,20 +69,20 @@ const UploadCSV = () => {
 
   const handleUpload = () => {
     if (!csvFile || !selectedSite) return;
-  
+
     const fileExtension = csvFile.name.split('.').pop();
-    
+
     const parseFile = (file) => {
       if (fileExtension === 'csv') {
         Papa.parse(file, {
           header: true,
           complete: (results) => {
             const quotations = results.data
-              .filter(row => row.product_id && row.width && row.height) 
+              .filter(row => row.product_id && row.width && row.height)
               .map(row => ({
-                site_id: selectedSite,  
-                product_id: row.product_id || null, 
-                width: row.width ? parseFloat(row.width) : null, 
+                site_id: selectedSite,
+                product_id: row.product_id || null,
+                width: row.width ? parseFloat(row.width) : null,
                 height: row.height ? parseFloat(row.height) : null,
                 shape: row.shape || null,
                 custom_shape: row.custom_shape || null,
@@ -66,15 +91,14 @@ const UploadCSV = () => {
                 linear_foot: row.linear_foot ? parseFloat(row.linear_foot) : null,
                 square_foot: row.square_foot ? parseFloat(row.square_foot) : null,
               }));
-  
-            
+
             if (quotations.length > 0) {
               handleQuotations(quotations);
             } else {
-              console.error('No valid quotations found in the file.');
+              showErrorToast('No valid quotations found in the file.');
             }
           },
-          error: (error) => console.error('Error parsing CSV:', error),
+          error: (error) => showErrorToast(`Error parsing CSV: ${error.message}`),
         });
       } else if (['xlsx', 'xls'].includes(fileExtension)) {
         const reader = new FileReader();
@@ -83,9 +107,9 @@ const UploadCSV = () => {
           const workbook = XLSX.read(data, { type: 'array' });
           const worksheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-  
+
           const quotations = jsonData.slice(1)
-            .filter(row => row[0] && row[1] && row[2]) 
+            .filter(row => row[0] && row[1] && row[2])
             .map(row => ({
               site_id: selectedSite,
               product_id: row[0] || null,
@@ -98,49 +122,45 @@ const UploadCSV = () => {
               linear_foot: row[7] ? parseFloat(row[7]) : null,
               square_foot: row[8] ? parseFloat(row[8]) : null,
             }));
-  
-          
+
           if (quotations.length > 0) {
             handleQuotations(quotations);
           } else {
-            console.error('No valid quotations found in the file.');
+            showErrorToast('No valid quotations found in the file.');
           }
         };
         reader.readAsArrayBuffer(file);
       } else {
-        console.error('Unsupported file format');
+        showErrorToast('Unsupported file format');
       }
     };
-  
+
     parseFile(csvFile);
     handleCloseModal();
   };
-  
 
   const fetchSites = async () => {
     try {
       const data = await getSites();
       setSites(data);
     } catch (error) {
-      console.error('Error fetching sites:', error);
+      showErrorToast(`Error fetching sites: ${error.message}`);
     }
   };
-
 
   const handleQuotations = async (quotations) => {
     try {
       await addQuotations(selectedSite, quotations);
-      setShowAlert(true);
+      showSuccessToast('Quotation added successfully!');
       setTimeout(() => setShowAlert(false), 3000);
     } catch (error) {
-      console.error('Error submitting quotations:', error);
+      showErrorToast(`Error submitting quotations: ${error.message}`);
     }
   };
 
-  useEffect(()=>{
-    fetchSites()
-
-  },[])
+  useEffect(() => {
+    fetchSites();
+  }, []);
 
   return (
     <div>
@@ -148,16 +168,9 @@ const UploadCSV = () => {
         onClick={handleOpenModal}
         className="bg-blue-500 text-white py-2 px-4 rounded-md shadow hover:bg-blue-600 transition"
       >
-        
-        Upload CSV 
+        Upload CSV
         <FontAwesomeIcon icon={faUpload} className="ml-2" />
       </button>
-
-      {showAlert && (
-        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white py-2 px-4 rounded-md shadow-lg transition-opacity duration-300">
-          Quotation added successfully!
-        </div>
-      )}
 
       <Modal
         isOpen={isModalOpen}
@@ -204,11 +217,10 @@ const UploadCSV = () => {
           </button>
         </div>
       </Modal>
+
+      <ToastContainer />
     </div>
   );
 };
 
 export default UploadCSV;
-
-
-
