@@ -3,6 +3,7 @@ import { getQuotations, createQuotation, getProducts, getSites, getShapes,getWid
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import UploadCSV from './UploadCSV';
 
 
 const ParentCard = styled.div`
@@ -354,6 +355,7 @@ const QuotesPage = () => {
       <ParentCard>
         <HeaderRow>
           <QuotationsLabel>Quotations</QuotationsLabel>
+          <UploadCSV />
           <AddQuoteButton onClick={handleAddQuote}>Add New Quote</AddQuoteButton>
         </HeaderRow>
 
