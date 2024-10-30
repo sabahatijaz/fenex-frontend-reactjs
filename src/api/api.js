@@ -144,4 +144,22 @@ export const addQuotations = async (site_id, quotations) => {
     return response.data;
 };
 
+// export const getProductIdsByNames = async (productNames) => {
+//     const response = await api.get(`/products/by-names/${productNames}`);
+//     return response.data; 
+// };
+
+
+export const getProductIdsByNames = async (productNames) => {
+    try {
+      const response = await api.get(`/products/by-names/${productNames}`);
+      return response.data.reduce((acc, product) => {
+        acc[product.product_name] = product.id; 
+        return acc;
+      }, {});
+    } catch (error) {
+      throw new Error(`Error fetching product IDs: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
 export default api;
