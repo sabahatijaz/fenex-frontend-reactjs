@@ -53,7 +53,8 @@ const sanitizeQuotes = (str) => {
   return str.replace(/’|‘|["']/g, "'").trim(); 
 };
 
-const UploadCSV = () => {
+const UploadCSV = ({quotationresponse}) => {
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSite, setSelectedSite] = useState('');
   const [csvFile, setCsvFile] = useState(null);
@@ -85,7 +86,8 @@ const UploadCSV = () => {
         header: true,
         complete: async (results) => {
           const productNames = Array.from(new Set(results.data.map(row => sanitizeQuotes(row.product_name)).filter(name => name)));
-
+          console.log('productNames',productNames);
+          
           if (productNames.length === 0) {
             showErrorToast('No valid product names found.');
             return;
@@ -93,6 +95,8 @@ const UploadCSV = () => {
 
           try {
             const productResponse = await getProductIdsByNames(productNames);
+            console.log('productResponse',productResponse);
+            
             const productIdsMap = {};
             Object.entries(productResponse).forEach(([productName, productId]) => {
               productIdsMap[productName] = productId; 
@@ -206,7 +210,9 @@ const UploadCSV = () => {
 
   const handleQuotations = async (quotations) => {
     try {
-      await addQuotations(selectedSite, quotations);
+      const response = await addQuotations(selectedSite, quotations);
+      quotationresponse(response)
+      
       showSuccessToast('Quotation added successfully!');
     } catch (error) {
       showErrorToast(`Error submitting quotations: ${error.message}`);

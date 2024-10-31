@@ -175,6 +175,9 @@ const QuotesPage = () => {
   const [possibleLenght,setPossibleLenght] = useState()  
   const [isWidthDisabled, setIsWidthDisabled] = useState(true);
   const [isLenghtDisabled,setIsLenghtDisabled] = useState(true)
+  const [CSVQuotation,setCSVQuotation] = useState([])
+  console.log('CSVQuotation',CSVQuotation);
+  
   const [newQuote, setNewQuote] = useState({
     product_id: '',
     height: 0,
@@ -350,12 +353,16 @@ const QuotesPage = () => {
     }
   };
 
+  const handleGetQuoatation=(data)=>{
+    setCSVQuotation(data)
+  }
+
   return (
     <div style={{ padding: '20px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
       <ParentCard>
         <HeaderRow>
           <QuotationsLabel>Quotations</QuotationsLabel>
-          <UploadCSV /> 
+          <UploadCSV quotationresponse={handleGetQuoatation} /> 
           <AddQuoteButton onClick={handleAddQuote}>Add New Quote</AddQuoteButton>
           
         </HeaderRow>
@@ -371,6 +378,18 @@ const QuotesPage = () => {
               <OpenQuoteButton onClick={() => handleOpenQuote(quote.id)}>Open Quote</OpenQuoteButton>
             </QuoteCard>
           ))}
+
+          {
+            CSVQuotation.map((quote)=>(
+              <QuoteCard key={quote.id}>
+              <p><strong>Product:</strong> {quote.product.product_name}</p>
+              <p><strong>Dimensions:</strong> {quote.height} cm x {quote.width} cm</p>
+              <p><strong>Quantity:</strong> {quote.quantity}</p>
+              <OpenQuoteButton onClick={() => handleOpenQuote(quote.id)}>Open Quote</OpenQuoteButton>
+            </QuoteCard>
+
+            ))
+          }
         </QuotesWrapper>
       </ParentCard>
 
