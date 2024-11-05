@@ -328,7 +328,7 @@ const QuotesPage = () => {
         console.error('Error fetching productID');
       }
     } catch (error) {
-      console.error('Error fetching product', error);
+      console.error('Error fetching width', error);
     }
   };
   
