@@ -4,6 +4,9 @@ import Modal from 'react-modal';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import UploadCSV from './UploadCSV';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from 'react-toastify';
+
 
 
 const ParentCard = styled.div`
@@ -160,6 +163,31 @@ const SubmitButton = styled.button`
 
 Modal.setAppElement('#root');
 
+const showErrorToast = (message) => {
+  toast.error(message, {
+    position: 'bottom-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: 'colored',
+  });
+};
+
+const showSuccessToast = (message) => {
+  toast.success(message, {
+    position: 'bottom-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: 'colored',
+  });
+};
+
+
 const QuotesPage = () => {
   const navigate = useNavigate();
   const [quotes, setQuotes] = useState([]);
@@ -176,8 +204,6 @@ const QuotesPage = () => {
   const [isWidthDisabled, setIsWidthDisabled] = useState(true);
   const [isLenghtDisabled,setIsLenghtDisabled] = useState(true)
   const [CSVQuotation,setCSVQuotation] = useState([])
-  console.log('CSVQuotation',CSVQuotation);
-  
   const [newQuote, setNewQuote] = useState({
     product_id: '',
     height: 0,
@@ -193,7 +219,7 @@ const QuotesPage = () => {
       const data = await getQuotations();
       setQuotes(data);
     } catch (error) {
-      console.error('Error fetching quotes:', error);
+      showErrorToast(`Error fetching Quotes: ${error.message}`);
     }
   };
 
@@ -202,7 +228,7 @@ const QuotesPage = () => {
       const data = await getProducts();
       setProducts(data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      showErrorToast(`Error fetching Products: ${error.message}`);
     }
   };
 
@@ -211,7 +237,7 @@ const QuotesPage = () => {
       const data = await getSites();
       setSites(data);
     } catch (error) {
-      console.error('Error fetching sites:', error);
+      showErrorToast(`Error fetching sites: ${error.message}`);
     }
   };
 
@@ -220,7 +246,7 @@ const QuotesPage = () => {
       const data = await getShapes();
       setShapes(data);
     } catch (error) {
-      console.error('Error fetching shapes:', error);
+      showErrorToast(`Error fetching shapes: ${error.message}`);
     }
   };
 
@@ -289,6 +315,7 @@ const QuotesPage = () => {
 
       if(value === 'selectlenght'){
         setWidths([])
+        setProductID(null)
         setIsWidthDisabled(true);
       }
   
@@ -298,10 +325,10 @@ const QuotesPage = () => {
         setIsWidthDisabled(false);
         
       } else {
-        console.error('Product ID is not available');
+        console.error('Error fetching productID');
       }
     } catch (error) {
-      console.error('Error fetching width:', error);
+      console.error('Error fetching product', error);
     }
   };
   
@@ -309,7 +336,6 @@ const QuotesPage = () => {
       try{
         const value = e.target.value
         setProductID(value)
-        console.log(productId);
         const productlengths = await getPossibleLenght(value)
         setPossibleLenght(productlengths)
         setIsLenghtDisabled(false)
@@ -349,7 +375,7 @@ const QuotesPage = () => {
       setQuotes([...quotes, createdQuote]);
       handleCloseModal();
     } catch (error) {
-      console.error('Error creating quote:', error);
+      showErrorToast(`Error Create Quotation: ${error.message}`);
     }
   };
 
@@ -423,7 +449,7 @@ const QuotesPage = () => {
             <label htmlFor="product_id">Select Product:</label>
             <Select
               name="product_id"
-              value={newQuote.product_id}
+              value={productId}
               onChange={handleLenghtByProduct}
               required
             >

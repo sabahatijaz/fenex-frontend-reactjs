@@ -102,8 +102,6 @@ const UploadCSV = ({quotationresponse}) => {
 
             const quotations = results.data.map(row => {
               const productId = productIdsMap[sanitizeQuotes(row.product_name)];
-              console.log('productId',productId);
-              
               if (!productId) {
                 return null; 
               }
