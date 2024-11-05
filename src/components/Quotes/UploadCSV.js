@@ -86,8 +86,7 @@ const UploadCSV = ({quotationresponse}) => {
         header: true,
         complete: async (results) => {
           const productNames = Array.from(new Set(results.data.map(row => sanitizeQuotes(row.product_name)).filter(name => name)));
-          console.log('productNames',productNames);
-          
+
           if (productNames.length === 0) {
             showErrorToast('No valid product names found.');
             return;
@@ -95,8 +94,7 @@ const UploadCSV = ({quotationresponse}) => {
 
           try {
             const productResponse = await getProductIdsByNames(productNames);
-            console.log('productResponse',productResponse);
-            
+
             const productIdsMap = {};
             Object.entries(productResponse).forEach(([productName, productId]) => {
               productIdsMap[productName] = productId; 
@@ -107,7 +105,6 @@ const UploadCSV = ({quotationresponse}) => {
               console.log('productId',productId);
               
               if (!productId) {
-                // showErrorToast(`Product names "${sanitizeQuotes(row.product_name)}" not found.`);
                 return null; 
               }
 
