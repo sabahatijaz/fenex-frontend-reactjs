@@ -41,9 +41,10 @@ const SignIn = () => {
 
     try {
       const response = await api.post('/auth/signin', formData);
-      // Assuming the response contains the access token
-      localStorage.setItem('access_token', response.data.access_token);
-      navigate('/'); // Redirect to home
+      const { access_token , user_id } = response.data
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('user_id' , user_id )
+      navigate('/'); 
     } catch (error) {
       console.error('Sign In Error:', error);
       setErrorMessage('Invalid email or password. Please try again.');
@@ -55,7 +56,7 @@ const SignIn = () => {
       <Typography variant="h4" gutterBottom>
         Sign In
       </Typography>
-      {errorMessage && <Typography color="error">{errorMessage}</Typography>} {/* Error message */}
+      {errorMessage && <Typography color="error">{errorMessage}</Typography>} 
       <TextField
         label="Email"
         type="email"

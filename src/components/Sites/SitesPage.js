@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Modal from 'react-modal';
-import { getSites, createSite } from '../../api/api'; // Import your API functions
+import { getSites, createSite } from '../../api/api'; 
 
-// Styles for the parent card
+
 const ParentCard = styled.div`
   padding: 20px;
   width: 100%;
@@ -184,10 +184,12 @@ const SitesPage = () => {
       postal_code: '',
     },
     site_type: 'Commercial',
-    risks: [],  // Initialize as an array
+    risks: [], 
   });
 
-  // Fetch sites from API
+  
+
+  const userID = localStorage.getItem('user_id')
   useEffect(() => {
     const fetchSites = async () => {
       try {
@@ -200,6 +202,7 @@ const SitesPage = () => {
       }
     };
     fetchSites();
+
   }, []);
 
   const handleOpenSite = (siteId) => {
@@ -264,7 +267,7 @@ const SitesPage = () => {
           postal_code: newSite.site_location.postal_code,
         },
         site_type: newSite.site_type,
-        user_id: 1, 
+        user_id: userID, 
         risks: newSite.risks, // Convert risks to 
       };
       console.log(newSiteData); 
