@@ -243,7 +243,7 @@ const SitesPage = () => {
     } else if (name === 'risks') {
       setNewSite((prev) => ({
         ...prev,
-        risks: value.split(',').map((risk) => risk.trim()),  // Convert to array on change
+        risks: value.split(',').map((risk) => risk.trim()),  
       }));
     } else {
       setNewSite((prev) => ({
@@ -253,12 +253,12 @@ const SitesPage = () => {
     }
   };
 
-  // Submit new site to API
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const newSiteData = {
-        sitename: newSite.sitename,  // Add sitename field
+        sitename: newSite.sitename,  
         site_location: {
           street: newSite.site_location.street,
           city: newSite.site_location.city,
@@ -268,11 +268,11 @@ const SitesPage = () => {
         },
         site_type: newSite.site_type,
         user_id: userID, 
-        risks: newSite.risks, // Convert risks to 
+        risks: newSite.risks, 
       };
       console.log(newSiteData); 
-      const newsite=await createSite(newSiteData); // Call the API to create the site
-      setSites([...sites, newsite]); // Update state with the new site
+      const newsite=await createSite(newSiteData); 
+      setSites([...sites, newsite]); 
       setNewSite({
         name: '',
         site_location: {
@@ -288,7 +288,7 @@ const SitesPage = () => {
       handleCloseModal();
     } catch (err) {
       setError('Failed to add site');
-      console.error(err); // Log the error for debugging
+      console.error(err); 
     }
 };
 
@@ -343,7 +343,7 @@ const SitesPage = () => {
               <option value="Residential">Residential</option>
             </Select>
             <label>Risks (comma separated)</label>
-            <Input name="risks" value={newSite.risks} onChange={handleInputChange} required /> {/* Join array to show in input */}
+            <Input name="risks" value={newSite.risks} onChange={handleInputChange} required /> 
             <SubmitButton type="submit">Add Site</SubmitButton>
           </FormContainer>
         </Modal>
