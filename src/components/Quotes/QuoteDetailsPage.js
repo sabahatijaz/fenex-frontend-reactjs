@@ -61,6 +61,9 @@ const QuoteDetailsPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Get the user role from local storage (or use another method if applicable)
+  const userRole = localStorage.getItem('role'); // Default to 'User' if no role is set
+
   useEffect(() => {
     const fetchQuoteDetails = async () => {
       try {
@@ -142,33 +145,43 @@ const QuoteDetailsPage = () => {
       <DetailsCard>
         <h2>Quote Details</h2>
         <DetailsContent>
-          <p><strong>Product Name:</strong> {quoteDetails.product.product_name}</p>
-          <p><strong>Dimensions:</strong> {height} cm x {width} cm</p>
-          <p><strong>Total Perimeter Linear Foot:</strong> {totalPerimeterLF.toFixed(2)} LF</p>
-          <p><strong>Total SQ/FT:</strong> {totalSqFt.toFixed(2)} sq/ft</p>
-          <p><strong>Quantity:</strong> {quantity}</p>
-          <p><strong>Total Cost:</strong> ${totalCost.toFixed(2)}</p>
+          {userRole === 'admin' ? (
+            <>
+              <p><strong>Product Name:</strong> {quoteDetails.product.product_name}</p>
+              <p><strong>Dimensions:</strong> {height} cm x {width} cm</p>
+              <p><strong>Total Perimeter Linear Foot:</strong> {totalPerimeterLF.toFixed(2)} LF</p>
+              <p><strong>Total SQ/FT:</strong> {totalSqFt.toFixed(2)} sq/ft</p>
+              <p><strong>Quantity:</strong> {quantity}</p>
+              <p><strong>Total Cost:</strong> ${totalCost.toFixed(2)}</p>
 
-          {/* Table displaying the cost breakdown */}
-          <Table>
-            <thead>
-              <tr>
-                <TableHeader>Product</TableHeader>
-                <TableHeader>Estimate</TableHeader>
-                <TableHeader>Unit Price Estimate</TableHeader>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(estimatedCosts).map(([key, value]) => (
-                <tr key={key}>
-                  <TableCell>{key.replace(/([A-Z])/g, ' $1').trim()}</TableCell>
-                  <TableCell>${value.toFixed(2)}</TableCell>
-                  <TableCell>${unitPrices[key] ? unitPrices[key].toFixed(2) : '-'} per {key.includes('Frame') ? 'LF' : 'sq/ft'}</TableCell>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+              {/* Table displaying the cost breakdown */}
+              <Table>
+                <thead>
+                  <tr>
+                    <TableHeader>Product</TableHeader>
+                    <TableHeader>Estimate</TableHeader>
+                    <TableHeader>Unit Price Estimate</TableHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(estimatedCosts).map(([key, value]) => (
+                    <tr key={key}>
+                      <TableCell>{key.replace(/([A-Z])/g, ' $1').trim()}</TableCell>
+                      <TableCell>${value.toFixed(2)}</TableCell>
+                      <TableCell>${unitPrices[key] ? unitPrices[key].toFixed(2) : '-'} per {key.includes('Frame') ? 'LF' : 'sq/ft'}</TableCell>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </>
+          ) : (
+            <>
+              <p><strong>Total Cost:</strong> ${totalCost.toFixed(2)}</p>
+              <p><strong>Quantity:</strong> {quantity}</p>
+            </>
+          )}
         </DetailsContent>
+        <BackButton onClick={handleBack}>Go Back</BackButton>
       </DetailsCard>
     </div>
   );

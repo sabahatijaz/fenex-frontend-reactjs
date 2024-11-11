@@ -41,9 +41,15 @@ const SignIn = () => {
 
     try {
       const response = await api.post('/auth/signin', formData);
-      // Assuming the response contains the access token
-      localStorage.setItem('access_token', response.data.access_token);
-      navigate('/'); // Redirect to home
+      
+      const { access_token, user_id, role } = response.data;
+
+      
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('user_id', user_id);
+      localStorage.setItem('role', role);
+
+      navigate('/'); 
     } catch (error) {
       console.error('Sign In Error:', error);
       setErrorMessage('Invalid email or password. Please try again.');

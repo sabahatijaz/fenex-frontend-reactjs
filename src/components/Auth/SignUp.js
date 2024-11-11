@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Divider } from '@mui/material';
-import { FaGoogle, FaFacebook } from 'react-icons/fa'; // Importing Google and Facebook icons
+import { TextField, Button, Container, Typography, Divider, Radio, RadioGroup, FormControlLabel, FormLabel } from '@mui/material';
+import { FaGoogle, FaFacebook } from 'react-icons/fa'; 
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/api';
 import styled from 'styled-components';
@@ -32,17 +32,18 @@ const SignUp = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('user');
   const navigate = useNavigate();
 
   const handleSignUp = async () => {
     try {
-      const response = await api.post('/auth/signup', { username, email, password });
-      if (response.status === 201) { // Assuming 201 Created is the response status for successful user creation
+      const response = await api.post('/auth/signup', { username, email, password, role });
+      if (response.status === 201) { 
         navigate('/signin');
       }
     } catch (error) {
       console.error('Sign Up Error:', error);
-      // Handle the error accordingly
+      
     }
   };
 
@@ -51,6 +52,18 @@ const SignUp = () => {
       <Typography variant="h4" gutterBottom>
         Sign Up
       </Typography>
+      
+      
+      <FormLabel component="legend">Select Role</FormLabel>
+      <RadioGroup
+        row
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+      >
+        <FormControlLabel value="admin" control={<Radio />} label="Admin" />
+        <FormControlLabel value="user" control={<Radio />} label="User" />
+      </RadioGroup>
+
       <TextField
         label="Username"
         type="text"
