@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://192.168.1.26:8000', 
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000', 
 });
 
 
@@ -88,7 +88,7 @@ export const createQuotation = async (quotation) => {
     return response.data;
 };
 
-export const getQuotations = async (skip = 0, limit = 10) => {
+export const getQuotations = async (skip = 0, limit = 19) => {
     const response = await api.get(`/quotations?skip=${skip}&limit=${limit}`);
     return response.data;
 };
@@ -114,12 +114,12 @@ export const getLenghtByWidth = async (width) =>{
     
 }
 
-export const getWidthByLenght = async (productId,length) =>{
+export const getWidthByLenght = async (productId=1,length=72) =>{
     const response = await api.get(`/width-by-length/${productId}/${length}`)
     return response.data
 }
 
-export const getPossibleLenght = async (product_id) =>{
+export const getPossibleLenght = async (product_id=2) =>{
     const response = await api.get(`/possible-lengths/${product_id}`)
     return response.data
 }
@@ -155,5 +155,21 @@ export const getProductIdsByNames = async (productNames) => {
       throw new Error(`Error fetching product IDs: ${error.response?.data?.message || error.message}`);
     }
   };
+
+
+export const getversionHistory = async (quotation_id=12) =>{
+    try{
+        const response =await api.get(`/versions/${quotation_id}`)
+        return response.data
+    } catch (error) {
+        throw new Error(`Error fetching Versions: ${error.response?.data?.message || error.message}`);
+      }
+}  
+
+
+export const updateQuoations = async (quotation_id, quotations) => {
+    const response = await api.put(`/quotations/${quotation_id}`, quotations);
+    return response.data;
+};
 
 export default api;
