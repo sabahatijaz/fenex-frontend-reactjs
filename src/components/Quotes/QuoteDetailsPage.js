@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuotationById } from '../../api/api'; // Updated function
+import { getQuotationById,getversionHistory  } from '../../api/api'; // Updated function
 import styled from 'styled-components';
 
 // Styled components
@@ -63,6 +63,17 @@ const QuoteDetailsPage = () => {
 
   // Get the user role from local storage (or use another method if applicable)
   const userRole = localStorage.getItem('role'); // Default to 'User' if no role is set
+  useEffect(() => {
+    const fetchVersionHistory = async () => {
+      try {
+        await getversionHistory();
+      } catch (error) {
+        console.error("Error fetching version history:", error);
+      }
+    };
+  
+    fetchVersionHistory();
+  }, []);
 
   useEffect(() => {
     const fetchQuoteDetails = async () => {
@@ -140,6 +151,8 @@ const QuoteDetailsPage = () => {
   // Calculate the total cost
   const totalCost = Object.values(estimatedCosts).reduce((acc, cost) => acc + cost, 0);
 
+  
+
   return (
     <div style={{ padding: '20px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
       <DetailsCard>
@@ -176,8 +189,13 @@ const QuoteDetailsPage = () => {
             </>
           ) : (
             <>
-              <p><strong>Total Cost:</strong> ${totalCost.toFixed(2)}</p>
+              <p><strong>Product Name:</strong> {quoteDetails.product.product_name}</p>
+              <p><strong>Dimensions:</strong> {height} cm x {width} cm</p>
+              <p><strong>Total Perimeter Linear Foot:</strong> {totalPerimeterLF.toFixed(2)} LF</p>
+              <p><strong>Total SQ/FT:</strong> {totalSqFt.toFixed(2)} sq/ft</p>
               <p><strong>Quantity:</strong> {quantity}</p>
+              <p><strong>Total Cost:</strong> ${totalCost.toFixed(2)}</p>
+
             </>
           )}
         </DetailsContent>

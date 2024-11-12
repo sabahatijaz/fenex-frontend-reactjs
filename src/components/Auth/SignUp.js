@@ -52,8 +52,6 @@ const SignUp = () => {
       <Typography variant="h4" gutterBottom>
         Sign Up
       </Typography>
-      
-      
       <FormLabel component="legend">Select Role</FormLabel>
       <RadioGroup
         row

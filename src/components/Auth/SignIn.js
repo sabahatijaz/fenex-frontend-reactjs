@@ -41,10 +41,7 @@ const SignIn = () => {
 
     try {
       const response = await api.post('/auth/signin', formData);
-      
       const { access_token, user_id, role } = response.data;
-
-      
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('user_id', user_id);
       localStorage.setItem('role', role);
