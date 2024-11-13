@@ -1,9 +1,11 @@
+
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuotationById, getversionHistory, updateQuoations,getWidthByLenght } from '../../api/api'; // Updated functions
+import { getQuotationById, updateQuoations ,getPossibleLenght, getWidthByLenght ,getQuotations} from '../../api/api'; // Import your API functions
 import styled from 'styled-components';
+import { Select, MenuItem, InputLabel, FormControl, Button, TextField } from '@mui/material';
 
-// Styled components
 const DetailsCard = styled.div`
   padding: 20px;
   width: 100%;
@@ -97,20 +99,27 @@ const ModalButton = styled.button`
 `;
 
 const QuoteDetailsPage = () => {
-  const { quoteId } = useParams(); 
+  const { quoteId } = useParams();
   const [quoteDetails, setQuoteDetails] = useState(null);
+  console.log('quoteDetails',quoteDetails);
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [newHeight, setNewHeight] = useState('');
   const [newWidth, setNewWidth] = useState('');
+  const [lengths, setLengths] = useState([]); 
+  const [widths, setWidths] = useState([]);  
+  const [selectedLength, setSelectedLength] = useState(''); 
+  const [selectedWidth, setSelectedWidth] = useState(''); 
+  const [quotations,setQuotations] = useState()
+  // console.log(quotations);
+  
+
+
   const navigate = useNavigate();
 
   const userRole = localStorage.getItem('role'); 
-
-
-
-  
 
   useEffect(() => {
     const fetchQuoteDetails = async () => {
@@ -132,52 +141,100 @@ const QuoteDetailsPage = () => {
     navigate('/');
   };
 
-  const handleUpdateClick = () => {
-    setNewHeight(quoteDetails.height);
-    setNewWidth(quoteDetails.width);
-    setShowModal(true);
-  };
-
-  const handleUpdateSubmit = async () => {
+  const fetchLengths = async () => {
     try {
-      const updatedQuote = {
-        ...quoteDetails,
-        height: newHeight,
-        width: newWidth,
-
-      };
-      await updateQuoations(quoteId, updatedQuote);
-      setQuoteDetails(updatedQuote);
-      setShowModal(false);
+      const productId = quoteDetails?.product_id; 
+      const fetchedLengths = await getPossibleLenght(productId);
+      setLengths(fetchedLengths);
     } catch (error) {
-      console.error("Error updating quote:", error);
+      console.error('Error fetching lengths:', error);
     }
   };
 
 
-  // const handleGetWidthByLenghtChange = async (e) => {
-  //   try {
-  //     const value = e.target.value;
-  //     setLengths(value);
-
-  //     if(value === 'selectlenght'){
-  //       setWidths([])
-  //       setProductID(null)
-  //       setIsWidthDisabled(true);
-  //     }
   
-  //     if (productId) {
-  //       const width = await getWidthByLenght(productId, value);
-  //       setWidths(width);
-  //       setIsWidthDisabled(false);
-        
-  //     } else {
-  //       console.error('Error fetching productID');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching width', error);
-  //   }
+  const fetchWidths = async (length) => {
+    try {
+      const productId = quoteDetails?.product_id; 
+      const fetchedWidths = await getWidthByLenght(productId, length);
+      setWidths(fetchedWidths); 
+    } catch (error) {
+      console.error('Error fetching widths:', error);
+    }
+  };
+
+  // const handleUpdateClick = () => {
+  //   setNewHeight(quoteDetails.height);
+  //   setNewWidth(quoteDetails.width);
+  //   setShowModal(true); // Open the modal
   // };
+
+  const handleUpdateClick = () => {
+    setShowModal(true);
+    fetchLengths();
+  };
+
+  const handleLengthChange = (e) => {
+    setSelectedLength(e.target.value);
+    fetchWidths(e.target.value); 
+  };
+
+  const handleWidthChange = (e) => {
+    setSelectedWidth(e.target.value);
+  };
+
+  const handleUpdateSubmit = async () => {
+    try {
+   
+      const updatedQuote = {
+        ...quoteDetails,
+        height: Number(selectedLength), 
+        width: Number(selectedWidth),   
+      };
+      console.log('Updated Height and Width: ', updatedQuote.height, updatedQuote.width);
+      console.log('Selected Length and Width: ', selectedLength, selectedWidth);
+  
+      const response = await updateQuoations(quoteId, updatedQuote);
+      console.log('Response from update: ', response);
+  
+      setQuoteDetails(updatedQuote);
+      setShowModal(false); 
+    } catch (error) {
+      console.error("Error updating quote:", error);
+    }
+  };
+  
+
+
+  useEffect(() => {
+    const fetchQuoteDetails = async () => {
+      try {
+        const data = await getQuotationById(quoteId);
+        setQuoteDetails(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching quote details:', error);
+        setError('Failed to fetch quote details');
+        setLoading(false);
+      }
+    };
+
+    fetchQuoteDetails();
+  }, [quoteId]);
+
+  // useEffect(() =>{
+    // const fetchQuotations = async ()=>{
+    //   try{
+    //     const data = await getQuotations()
+    //     console.log('data quotations',data);
+        
+    //     setQuotations(data)  
+    //   }catch(error) {
+    //     console.error('quoataions error',error)
+    //   }
+    // }
+    // fetchQuotations()
+
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -262,32 +319,61 @@ const QuoteDetailsPage = () => {
         <BackButton onClick={handleBack}>Go Back</BackButton>
       </DetailsCard>
 
-      {/* Update Modal */}
+     
       {showModal && (
-        <ModalOverlay>
-          <ModalContainer>
-            <h3>Update Dimensions</h3>
-            <div>
-              <label>Height (cm):</label>
-              <ModalInput
-                type="number"
-                value={newHeight}
-                onChange={(e) => setNewHeight(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Width (cm):</label>
-              <ModalInput
-                type="number"
-                value={newWidth}
-                onChange={(e) => setNewWidth(e.target.value)}
-              />
-            </div>
-            <ModalButton onClick={handleUpdateSubmit}>Update</ModalButton>
-            <ModalButton onClick={() => setShowModal(false)} style={{ backgroundColor: '#dc3545', marginTop: '10px' }}>Cancel</ModalButton>
-          </ModalContainer>
-        </ModalOverlay>
-      )}
+  <ModalOverlay>
+    <ModalContainer>
+      <h3>Update Dimensions</h3>
+
+      
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="length-label">Select Height</InputLabel>
+        <Select
+          labelId="length-label"
+          value={selectedLength || ''}
+          onChange={handleLengthChange}
+          label="Select Length"
+        >
+          <MenuItem value="">Select Height</MenuItem>
+          {lengths.map((length) => (
+            <MenuItem key={length} value={length}>
+              {length} cm
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+     
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="width-label">Select Width</InputLabel>
+        <Select
+          labelId="width-label"
+          value={selectedWidth || ''}
+          onChange={handleWidthChange}
+          label="Select Width"
+        >
+          <MenuItem value="">Select Width</MenuItem>
+          {widths.map((width) => (
+            <MenuItem key={width} value={width}>
+              {width} cm
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+        <Button variant="contained" color="primary" onClick={handleUpdateSubmit}>
+          Submit
+        </Button>
+        <Button variant="contained" color="error" onClick={() => setShowModal(false)}>
+          Close
+        </Button>
+      </div>
+    </ModalContainer>
+  </ModalOverlay>
+)}
+
     </div>
   );
 };

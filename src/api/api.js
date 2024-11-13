@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000', 
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://192.168.1.26:8000', 
 });
 
 
@@ -114,7 +114,7 @@ export const getLenghtByWidth = async (width) =>{
     
 }
 
-export const getWidthByLenght = async (productId=1,length=72) =>{
+export const getWidthByLenght = async (productId,length) =>{
     const response = await api.get(`/width-by-length/${productId}/${length}`)
     return response.data
 }
@@ -168,7 +168,12 @@ export const getversionHistory = async (quotation_id=12) =>{
 
 
 export const updateQuoations = async (quotation_id, quotations) => {
-    const response = await api.put(`/quotations/${quotation_id}`, quotations);
+    const payload = {
+        width: quotations.width,
+        height: quotations.height,
+    }
+    console.log('Payload : ', typeof(quotations.height))
+    const response = await api.put(`/quotations/${quotation_id}`, payload);
     return response.data;
 };
 
