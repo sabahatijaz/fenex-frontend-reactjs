@@ -119,7 +119,7 @@ export const getWidthByLenght = async (productId,length) =>{
     return response.data
 }
 
-export const getPossibleLenght = async (product_id=2) =>{
+export const getPossibleLenght = async (product_id) =>{
     const response = await api.get(`/possible-lengths/${product_id}`)
     return response.data
 }

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuotationById, updateQuoations ,getPossibleLenght, getWidthByLenght ,getQuotations} from '../../api/api'; // Import your API functions
+import { getQuotationById, updateQuoations ,getPossibleLenght, getWidthByLenght ,getQuotations} from '../../api/api'; 
 import styled from 'styled-components';
 import { Select, MenuItem, InputLabel, FormControl, Button, TextField } from '@mui/material';
 
