@@ -157,7 +157,7 @@ export const getProductIdsByNames = async (productNames) => {
   };
 
 
-export const getversionHistory = async (quotation_id=12) =>{
+export const getversionHistory = async (quotation_id) =>{
     try{
         const response =await api.get(`/versions/${quotation_id}`)
         return response.data
@@ -172,7 +172,6 @@ export const updateQuoations = async (quotation_id, quotations) => {
         width: quotations.width,
         height: quotations.height,
     }
-    console.log('Payload : ', typeof(quotations.height))
     const response = await api.put(`/quotations/${quotation_id}`, payload);
     return response.data;
 };

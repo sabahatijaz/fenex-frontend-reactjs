@@ -17,6 +17,12 @@ const DetailsCard = styled.div`
   min-height: 80vh;
 `;
 
+const ButtonContainer = styled.div`
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+`;
+
 const BackButton = styled.button`
   background-color: #007bff;
   color: white;
@@ -26,11 +32,26 @@ const BackButton = styled.button`
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  margin-bottom: 20px;
   transition: background-color 0.3s ease;
 
   &:hover {
     background-color: #0056b3;
+  }
+`;
+
+const UpdateButton = styled.button`
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #218838;
   }
 `;
 
@@ -101,21 +122,13 @@ const ModalButton = styled.button`
 const QuoteDetailsPage = () => {
   const { quoteId } = useParams();
   const [quoteDetails, setQuoteDetails] = useState(null);
-  console.log('quoteDetails',quoteDetails);
-  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [newHeight, setNewHeight] = useState('');
-  const [newWidth, setNewWidth] = useState('');
   const [lengths, setLengths] = useState([]); 
   const [widths, setWidths] = useState([]);  
   const [selectedLength, setSelectedLength] = useState(''); 
   const [selectedWidth, setSelectedWidth] = useState(''); 
-  const [quotations,setQuotations] = useState()
-  // console.log(quotations);
-  
-
 
   const navigate = useNavigate();
 
@@ -162,12 +175,6 @@ const QuoteDetailsPage = () => {
       console.error('Error fetching widths:', error);
     }
   };
-
-  // const handleUpdateClick = () => {
-  //   setNewHeight(quoteDetails.height);
-  //   setNewWidth(quoteDetails.width);
-  //   setShowModal(true); // Open the modal
-  // };
 
   const handleUpdateClick = () => {
     setShowModal(true);
@@ -222,20 +229,6 @@ const QuoteDetailsPage = () => {
     fetchQuoteDetails();
   }, [quoteId]);
 
-  // useEffect(() =>{
-    // const fetchQuotations = async ()=>{
-    //   try{
-    //     const data = await getQuotations()
-    //     console.log('data quotations',data);
-        
-    //     setQuotations(data)  
-    //   }catch(error) {
-    //     console.error('quoataions error',error)
-    //   }
-    // }
-    // fetchQuotations()
-
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
   if (!quoteDetails) return <p>No details available</p>;
@@ -280,6 +273,12 @@ const QuoteDetailsPage = () => {
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+      <ButtonContainer>
+        <BackButton onClick={handleBack}>Go Back</BackButton>
+        {userRole === 'admin' && (
+          <UpdateButton onClick={handleUpdateClick}>Update Quotation</UpdateButton>
+        )}
+      </ButtonContainer>
       <DetailsCard>
         <h2>Quote Details</h2>
         <DetailsContent>
@@ -310,13 +309,9 @@ const QuoteDetailsPage = () => {
             </tbody>
           </Table>
 
-          {userRole === 'admin' && (
-            <div style={{ marginTop: '20px' }}>
-              <button onClick={handleUpdateClick} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '8px' }}>Update Dimensions</button>
-            </div>
-          )}
+          
         </DetailsContent>
-        <BackButton onClick={handleBack}>Go Back</BackButton>
+        
       </DetailsCard>
 
      
@@ -330,7 +325,7 @@ const QuoteDetailsPage = () => {
         <InputLabel id="length-label">Select Height</InputLabel>
         <Select
           labelId="length-label"
-          value={selectedLength || ''}
+          value={selectedLength || height}
           onChange={handleLengthChange}
           label="Select Length"
         >
@@ -348,7 +343,7 @@ const QuoteDetailsPage = () => {
         <InputLabel id="width-label">Select Width</InputLabel>
         <Select
           labelId="width-label"
-          value={selectedWidth || ''}
+          value={selectedWidth || width }
           onChange={handleWidthChange}
           label="Select Width"
         >
