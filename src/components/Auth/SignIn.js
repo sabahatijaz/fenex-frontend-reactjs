@@ -58,7 +58,7 @@ const SignIn = () => {
       <Typography variant="h4" gutterBottom>
         Sign In
       </Typography>
-      {errorMessage && <Typography color="error">{errorMessage}</Typography>} {/* Error message */}
+      {errorMessage && <Typography color="error">{errorMessage}</Typography>} 
       <TextField
         label="Email"
         type="email"
