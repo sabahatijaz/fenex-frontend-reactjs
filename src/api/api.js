@@ -88,7 +88,7 @@ export const createQuotation = async (quotation) => {
     return response.data;
 };
 
-export const getQuotations = async (skip = 0, limit = 15) => {
+export const getQuotations = async (skip = 0, limit = 19) => {
     const response = await api.get(`/quotations?skip=${skip}&limit=${limit}`);
     return response.data;
 };
@@ -157,7 +157,7 @@ export const getProductIdsByNames = async (productNames) => {
   };
 
 
-export const getversionHistory = async (quotation_id=12) =>{
+export const getversionHistory = async (quotation_id) =>{
     try{
         const response =await api.get(`/versions/${quotation_id}`)
         return response.data
@@ -165,5 +165,15 @@ export const getversionHistory = async (quotation_id=12) =>{
         throw new Error(`Error fetching Versions: ${error.response?.data?.message || error.message}`);
       }
 }  
+
+
+export const updateQuoations = async (quotation_id, quotations) => {
+    const payload = {
+        width: quotations.width,
+        height: quotations.height,
+    }
+    const response = await api.put(`/quotations/${quotation_id}`, payload);
+    return response.data;
+};
 
 export default api;
