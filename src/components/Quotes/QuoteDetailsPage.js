@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuotationById, updateQuoations ,getPossibleLenght, getWidthByLenght ,getQuotations} from '../../api/api'; 
+import { getQuotationById, updateQuoations ,getPossibleLenght, getWidthByLenght ,getversionHistory} from '../../api/api'; 
 import styled from 'styled-components';
-import { Select, MenuItem, InputLabel, FormControl, Button, TextField } from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl, Button, TextField,Tabs, Tab,Box } from '@mui/material';
 
 const DetailsCard = styled.div`
   padding: 20px;
@@ -129,6 +129,12 @@ const QuoteDetailsPage = () => {
   const [widths, setWidths] = useState([]);  
   const [selectedLength, setSelectedLength] = useState(''); 
   const [selectedWidth, setSelectedWidth] = useState(''); 
+  const [versionHistory, setVersionHistory] = useState([]); 
+  console.log('versionHistory',versionHistory);
+  
+  const [selectedTab, setSelectedTab] = useState(0); 
+  const [selectedVersionDetails, setSelectedVersionDetails] = useState(null);
+
 
   const navigate = useNavigate();
 
@@ -139,6 +145,8 @@ const QuoteDetailsPage = () => {
       try {
         const data = await getQuotationById(quoteId);
         setQuoteDetails(data);
+        const versions = await getversionHistory(quoteId);
+        setVersionHistory(versions.history);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching quote details:', error);
@@ -150,8 +158,20 @@ const QuoteDetailsPage = () => {
     fetchQuoteDetails();
   }, [quoteId]);
 
+  useEffect(() => {
+    if (versionHistory.length > 0) {
+      setSelectedVersionDetails(versionHistory[0]); // Set the details of the first version by default
+    }
+  }, [versionHistory]);
+
   const handleBack = () => {
     navigate('/');
+  };
+
+
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+    setSelectedVersionDetails(versionHistory[newValue]);
   };
 
   const fetchLengths = async () => {
@@ -316,6 +336,23 @@ const QuoteDetailsPage = () => {
           </DetailsContent>
         )}
       </DetailsCard>
+
+      <Box sx={{ width: '100%', borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={selectedTab} onChange={handleTabChange} aria-label="Version History Tabs">
+          {versionHistory.map((version, index) => (
+            <Tab key={index} label={`Version ${index + 1}`} />
+          ))}
+        </Tabs>
+      </Box>
+      {selectedVersionDetails && (
+        <Box sx={{ padding: 2 }}>
+          <h4>Version Details</h4>
+          <p><strong>Height:</strong> {selectedVersionDetails.height} inches</p>
+          <p><strong>Width:</strong> {selectedVersionDetails.width} inches</p>
+          <p><strong>Quantity:</strong> {selectedVersionDetails.quantity}</p>
+          {/* Add more fields as per the version data you receive */}
+        </Box>
+      )}
      
       {showModal && (
   <ModalOverlay>
