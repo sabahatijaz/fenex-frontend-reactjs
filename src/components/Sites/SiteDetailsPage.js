@@ -421,9 +421,7 @@ const SiteDetailsPage = () => {
     try {
 
       const createdQuote = await createQuotation(newQuote);
-      console.log("Yes its meeeeee")
-      showSuccessToast(`Sites Data Successfully Submitted`);
-      setQuotes([...quotes, createdQuote]);
+      setQuotations([...quotations,createdQuote])
       handleCloseModal();
     } catch (error) {
       showErrorToast(`Error Create Quotation: ${error.message}`);
@@ -434,10 +432,6 @@ const SiteDetailsPage = () => {
     setCSVQuotation(data)
   }
 
-  useEffect(() => {
-    toast.success('Toast test on mount!');
-  }, []);
-  
 
   // Show loading or error state
   if (loading) return <p>Loading site details...</p>;
