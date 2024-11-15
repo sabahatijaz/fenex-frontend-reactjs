@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getSiteById, getQuotationsBySiteId, createQuotation, getProducts } from '../../api/api';
+import { getSiteById, getQuotationsBySiteId, createQuotation, getProducts,getQuotations,getPossibleLenght, getSites, getShapes,getWidthByLenght } from '../../api/api';
 import styled from 'styled-components';
 import Modal from 'react-modal';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from 'react-toastify';
 
 const Container = styled.div`
   padding: 20px;
@@ -127,6 +129,31 @@ const SubmitButton = styled.button`
 
 Modal.setAppElement('#root');
 
+const showErrorToast = (message) => {
+  toast.error(message, {
+    position: 'bottom-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: 'colored',
+  });
+};
+
+const showSuccessToast = (message) => {
+  toast.success(message, {
+    position: 'bottom-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: 'colored',
+  });
+};
+
+
 const SiteDetailsPage = () => {
   const { siteId } = useParams();
   const navigate = useNavigate();
@@ -134,15 +161,67 @@ const SiteDetailsPage = () => {
   const [quotations, setQuotations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [quotes, setQuotes] = useState([]);
+  const [sites, setSites] = useState([]);
+  const [shapes, setShapes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isShapeSelected, setIsShapeSelected] = useState(false);
+  const [lengths, setLengths] = useState([]); 
+  const [widths, setWidths] = useState([]); 
+  // const [heights, setHeights] = useState([]); 
+  const [productId,setProductID] =useState(null)
+  const [possibleLenght,setPossibleLenght] = useState()  
+  const [isWidthDisabled, setIsWidthDisabled] = useState(true);
+  const [isLenghtDisabled,setIsLenghtDisabled] = useState(true)
+  const [isShapeDisabled , setIsShapeDisabled] = useState(true)
+  const [CSVQuotation,setCSVQuotation] = useState([])
   const [newQuote, setNewQuote] = useState({
-    product_name: '',
+    product_id: 0,
     height: 0,
     width: 0,
     quantity: 1,
     shape: 'A-Flat',
+    site_id: 0,
+    radius: 60,
   });
-  const [products, setProducts] = useState([]);
+
+
+  const fetchQuotes = async () => {
+    try {
+      const data = await getQuotations();
+      setQuotes(data);
+    } catch (error) {
+      showErrorToast(`Error fetching Quotes: ${error.message}`);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      showErrorToast(`Error fetching Products: ${error.message}`);
+    }
+  };
+
+  const fetchSites = async () => {
+    try {
+      const data = await getSites();
+      setSites(data);
+    } catch (error) {
+      showErrorToast(`Error fetching sites: ${error.message}`);
+    }
+  };
+
+  const fetchShapes = async () => {
+    try {
+      const data = await getShapes();
+      setShapes(data);
+    } catch (error) {
+      showErrorToast(`Error fetching shapes: ${error.message}`);
+    }
+  };
 
   // Unit prices (move this outside the component if they are constants)
   const unitPrices = {
@@ -222,32 +301,143 @@ const SiteDetailsPage = () => {
     setIsModalOpen(true);
   };
 
+  const handleOpenQuote = (quoteId) => {
+    navigate(`/quote/${quoteId}`);
+  };
+
+  // const handleAddQuote = () => {
+  //   setIsModalOpen(true);
+  // };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setNewQuote({
+      product_id: 0,
+      height: 0,
+      width: 0,
+      quantity: 1,
+      shape: 'A-Flat',
+      site_id: 0,
+      custom_shape: '',
+      radius:60
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'shape') {
+      if (value === 'Shape') {
+        setIsShapeSelected(true);
+        setIsShapeDisabled(false)
+        fetchShapes(); 
+      } else {
+        setIsShapeSelected(false); 
+      }
+    }
+    setNewQuote({ ...newQuote, [name]: value });
+    if (name === 'custom_shape') {
+      setIsShapeSelected(true);
+    }
+  };
+  const handleGetWidthByLenghtChange = async (e) => {
+    try {
+      const value = e.target.value;
+      setLengths(value);
+
+      if(value === 'selectlenght'){
+        setWidths([])
+        setProductID(null)
+        setIsWidthDisabled(true);
+      }
+  
+      if (productId) {
+        const width = await getWidthByLenght(productId, value);
+        setWidths(width);
+        setIsWidthDisabled(false);
+        
+      } else {
+        console.error('Error fetching productID');
+      }
+    } catch (error) {
+      console.error('Error fetching width', error);
+    }
+  };
+  
+  const handleLenghtByProduct = async(e)=>{
+      try{
+        const value = e.target.value
+        setProductID(value)
+        const productlengths = await getPossibleLenght(value)
+        setPossibleLenght(productlengths)
+        setIsLenghtDisabled(false)
+
+        if(value === 'selectproduct'){
+          setProductID(null)
+          setIsLenghtDisabled(true)
+        }
+      }
+      catch (error) {
+        console.error('Error fetching possible lenghts:', error);
+      }
+  }
+
   // Handlers for modal and form
   const handleAddQuote = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  // const handleCloseModal = () => {
+  //   setIsModalOpen(false);
+  // };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewQuote({ ...newQuote, [name]: value });
-  };
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setNewQuote({ ...newQuote, [name]: value });
+  // };
+
+  useEffect(() => {
+    fetchQuotes();
+    fetchProducts();
+    fetchSites();
+    handleLenghtByProduct()
+
+
+  }, []);
+
+
+  useEffect(() => {
+    fetchQuotes();
+    fetchProducts();
+    fetchSites();
+
+  }, []);
+
+  useEffect(() => {
+    setNewQuote((prev) => ({ ...prev, product_id: productId , height : lengths }));
+  }, [productId,lengths]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      newQuote.site_id=siteId
+
       const createdQuote = await createQuotation(newQuote);
-      setQuotations([...quotations, createdQuote]);
-      setNewQuote({ product_name: '', height: 0, width: 0, quantity: 1, shape: 'A-Flat' });
+      console.log("Yes its meeeeee")
+      showSuccessToast(`Sites Data Successfully Submitted`);
+      setQuotes([...quotes, createdQuote]);
       handleCloseModal();
     } catch (error) {
-      console.error('Error creating quote:', error);
+      showErrorToast(`Error Create Quotation: ${error.message}`);
     }
   };
+
+  const handleGetQuoatation=(data)=>{
+    setCSVQuotation(data)
+  }
+
+  useEffect(() => {
+    toast.success('Toast test on mount!');
+  }, []);
+  
 
   // Show loading or error state
   if (loading) return <p>Loading site details...</p>;
@@ -255,7 +445,7 @@ const SiteDetailsPage = () => {
 
   return (
     <Container>
-      <Title>{site.sitename} Details</Title>
+      <Title>{site.sitename} Detail</Title>
       <Detail>
         <strong>Address:</strong> {`${site.site_location.street}, ${site.site_location.city}, ${site.site_location.state}, ${site.site_location.country}, ${site.site_location.postal_code}`}
       </Detail>
@@ -299,15 +489,31 @@ const SiteDetailsPage = () => {
         <h2>Add New Quote</h2>
         <form onSubmit={handleSubmit}>
           <FormContainer>
-            {/* Dropdown for selecting product */}
-            <label htmlFor="product_id">Select Product:</label>
+            
+         
+            <label htmlFor="site_id">Select Site:</label>
             <Select
-              name="product_id"
-              value={newQuote.product_id}
+              name="site_id"
+              value={newQuote.site_id}
               onChange={handleInputChange}
               required
             >
-              <option value="">Select Product</option>
+              <option value="">Select Site</option>
+              {sites.map((site) => (
+                <option key={site.id} value={site.id}>
+                  {site.sitename}
+                </option>
+              ))}
+            </Select>
+
+            <label htmlFor="product_id">Select Product:</label>
+            <Select
+              name="product_id"
+              value={productId}
+              onChange={handleLenghtByProduct}
+              required
+            >
+              <option value="selectproduct">Select Product</option>
               {products.map((product) => (
                 <option key={product.id} value={product.id}>
                   {product.product_name}
@@ -315,53 +521,83 @@ const SiteDetailsPage = () => {
               ))}
             </Select>
 
-            {/* Dropdown for selecting shape */}
-            <label htmlFor="shape">Select Shape:</label>
+            <label htmlFor="shape">Select Design:</label>
             <Select
               name="shape"
               value={newQuote.shape}
               onChange={handleInputChange}
               required
             >
-              <option value="A-Flat">A-Flat</option>
-              <option value="B-Shape">B-Shape</option>
-              <option value="C-Bend">C-Bend</option>
+              <option value="Flat">Flat</option>
+              <option value="Shape">Shape</option>
+              <option value="Round">Round</option>
             </Select>
 
-            {/* Input for height */}
-            <label htmlFor="height">Height (cm):</label>
-            <Input
-              type="number"
-              name="height"
-              placeholder="Height (cm)"
-              value={newQuote.height}
-              onChange={handleInputChange}
-              required
-            />
+                <label htmlFor="custom_shape">Select Custom Shape:</label>
+                <Select
+                  name="custom_shape"
+                  value={newQuote.custom_shape}
+                  onChange={handleInputChange}
+                  disabled={isShapeDisabled}
+                  required
+                >
+                  <option value="">Select Shape</option>
+                  {shapes.map((shape) => (
+                    <option key={shape} value={shape}>
+                      {shape}
+                    </option>
+                  ))}
+                </Select>
+               
+                <label htmlFor="shape_radius">Shape Radius (cm):</label>
+                <Input
+                  type="number"
+                  name="radius"
+                  value={newQuote.radius}
+                  onChange={handleInputChange}
+                  min="60"
+                  required
+                />
+            
+          <label htmlFor="length">Select Height:</label>
+          <Select
+          required
+          disabled={isLenghtDisabled}
+           onChange={handleGetWidthByLenghtChange}
+            >
+           <option value="selectlenght">Select Height</option>
+          {Array.isArray(possibleLenght) && possibleLenght.map((length) => (
+           <option key={length} value={length}>
+             {length} cm
+           </option>
+            ))}
+          </Select>
+        
+          <label htmlFor="lenght">Select Width:</label>
+          <Select
+           name="width"
+           value={newQuote.width}
+           onChange={handleInputChange}
+           disabled={isWidthDisabled} 
+           required
+           >
+          <option value="">Select Width</option>
+            {widths.map((width) => (
+            <option key={width} value={width}>
+            {width} cm
+           </option>
+          ))}
+          </Select>
 
-            {/* Input for width */}
-            <label htmlFor="width">Width (cm):</label>
-            <Input
-              type="number"
-              name="width"
-              placeholder="Width (cm)"
-              value={newQuote.width}
-              onChange={handleInputChange}
-              required
-            />
-
-            {/* Input for quantity */}
             <label htmlFor="quantity">Quantity:</label>
             <Input
               type="number"
               name="quantity"
-              placeholder="Quantity"
               value={newQuote.quantity}
               onChange={handleInputChange}
               required
             />
           </FormContainer>
-
           <SubmitButton type="submit">Submit Quote</SubmitButton>
         </form>
       </Modal>
