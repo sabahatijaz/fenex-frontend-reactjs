@@ -203,14 +203,15 @@ const QuotesPage = () => {
   const [possibleLenght,setPossibleLenght] = useState()  
   const [isWidthDisabled, setIsWidthDisabled] = useState(true);
   const [isLenghtDisabled,setIsLenghtDisabled] = useState(true)
+  const [isShapeDisabled , setIsShapeDisabled] = useState(true)
   const [CSVQuotation,setCSVQuotation] = useState([])
   const [newQuote, setNewQuote] = useState({
-    product_id: '',
+    product_id: 0,
     height: 0,
-    width: '',
+    width: 0,
     quantity: 1,
     shape: 'A-Flat',
-    site_id: '',
+    site_id: 0,
     radius: 60,
   });
 
@@ -273,12 +274,12 @@ const QuotesPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setNewQuote({
-      product_id: '',
+      product_id: 0,
       height: 0,
       width: 0,
       quantity: 1,
       shape: 'A-Flat',
-      site_id: '',
+      site_id: 0,
       custom_shape: '',
       radius:60
     });
@@ -292,6 +293,7 @@ const QuotesPage = () => {
     if (name === 'shape') {
       if (value === 'Shape') {
         setIsShapeSelected(true);
+        setIsShapeDisabled(false)
         fetchShapes(); 
       } else {
         setIsShapeSelected(false); 
@@ -366,12 +368,15 @@ const QuotesPage = () => {
     fetchSites();
 
   }, []);
+  useEffect(() => {
+  setNewQuote((prev) => ({ ...prev, product_id: productId , height : lengths }));
+}, [productId,lengths]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log(newQuote)
       const createdQuote = await createQuotation(newQuote);
+      showSuccessToast(`Quotation Data Successfully Submitted`)
       setQuotes([...quotes, createdQuote]);
       handleCloseModal();
     } catch (error) {
@@ -473,13 +478,12 @@ const QuotesPage = () => {
               <option value="Round">Round</option>
             </Select>
 
-            {isShapeSelected && (
-              <>
                 <label htmlFor="custom_shape">Select Custom Shape:</label>
                 <Select
                   name="custom_shape"
                   value={newQuote.custom_shape}
                   onChange={handleInputChange}
+                  disabled={isShapeDisabled}
                   required
                 >
                   <option value="">Select Shape</option>
@@ -499,16 +503,14 @@ const QuotesPage = () => {
                   min="60"
                   required
                 />
-              </>
-            )}
-
-          <label htmlFor="length">Select Length:</label>
+            
+          <label htmlFor="length">Select Height:</label>
           <Select
           required
           disabled={isLenghtDisabled}
            onChange={handleGetWidthByLenghtChange}
             >
-           <option value="selectlenght">Select Length</option>
+           <option value="selectlenght">Select Height</option>
           {Array.isArray(possibleLenght) && possibleLenght.map((length) => (
            <option key={length} value={length}>
              {length} cm
@@ -531,15 +533,6 @@ const QuotesPage = () => {
            </option>
           ))}
           </Select>
-
-            <label htmlFor="height">Height (cm):</label>
-            <Input
-              type="number"
-              name="height"
-              value={newQuote.height}
-              onChange={handleInputChange}
-              required
-            />
 
             <label htmlFor="quantity">Quantity:</label>
             <Input

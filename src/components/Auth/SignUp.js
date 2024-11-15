@@ -40,7 +40,7 @@ const SignUp = () => {
   const handleSignUp = async () => {
     try {
       const response = await api.post('/auth/signup', { username, email, password, role });
-      if (response.status === 201) { 
+      if (response.status === 200) { 
         navigate('/signin');
       }
     } catch (error) {
