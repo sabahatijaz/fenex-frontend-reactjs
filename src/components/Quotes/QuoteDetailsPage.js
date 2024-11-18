@@ -129,11 +129,9 @@ const QuoteDetailsPage = () => {
   const [widths, setWidths] = useState([]);  
   const [selectedLength, setSelectedLength] = useState(''); 
   const [selectedWidth, setSelectedWidth] = useState(''); 
-  const [versionHistory, setVersionHistory] = useState([]); 
-  console.log('versionHistory',versionHistory);
-  
+  const [versionHistory, setVersionHistory] = useState([]);
   const [selectedTab, setSelectedTab] = useState(0); 
-  const [selectedVersionDetails, setSelectedVersionDetails] = useState(null);
+  const [selectedVersionDetails, setSelectedVersionDetails] = useState(null);  
 
 
   const navigate = useNavigate();
@@ -338,19 +336,24 @@ const QuoteDetailsPage = () => {
       </DetailsCard>
 
       <Box sx={{ width: '100%', borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={selectedTab} onChange={handleTabChange} aria-label="Version History Tabs">
-          {versionHistory.map((version, index) => (
-            <Tab key={index} label={`Version ${index + 1}`} />
-          ))}
-        </Tabs>
-      </Box>
+     <Tabs
+    value={selectedTab}
+    onChange={handleTabChange}
+    aria-label="Version History Tabs"
+    variant="scrollable" 
+    scrollButtons="auto" 
+  >
+    {versionHistory.map((version, index) => (
+      <Tab key={index} label={`Version ${index + 1}`} />
+    ))}
+  </Tabs>
+</Box>
       {selectedVersionDetails && (
         <Box sx={{ padding: 2 }}>
           <h4>Version Details</h4>
           <p><strong>Height:</strong> {selectedVersionDetails.height} inches</p>
           <p><strong>Width:</strong> {selectedVersionDetails.width} inches</p>
           <p><strong>Quantity:</strong> {selectedVersionDetails.quantity}</p>
-          {/* Add more fields as per the version data you receive */}
         </Box>
       )}
      
