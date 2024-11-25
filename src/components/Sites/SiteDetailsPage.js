@@ -591,8 +591,9 @@ const SiteDetailsPage = () => {
               onChange={handleInputChange}
               required
             />
+              <SubmitButton type="submit">Submit Quote</SubmitButton>
           </FormContainer>
-          <SubmitButton type="submit">Submit Quote</SubmitButton>
+          
         </form>
       </Modal>
     </Container>

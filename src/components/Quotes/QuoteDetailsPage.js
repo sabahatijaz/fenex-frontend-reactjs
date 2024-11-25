@@ -293,9 +293,7 @@ const QuoteDetailsPage = () => {
     <div style={{ padding: '20px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
       <ButtonContainer>
         <BackButton onClick={handleBack}>Go Back</BackButton>
-        {userRole === 'admin' && (
-          <UpdateButton onClick={handleUpdateClick}>Update Quotation</UpdateButton>
-        )}
+        <UpdateButton onClick={handleUpdateClick}>Update Quotation</UpdateButton>
       </ButtonContainer>
       <DetailsCard>
         <h2>Quote Details</h2>

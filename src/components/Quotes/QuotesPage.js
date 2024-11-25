@@ -161,6 +161,100 @@ const SubmitButton = styled.button`
   }
 `;
 
+const BackButton = styled.button`
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #ccc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background-color: #888;
+  }
+`;
+
+const ImageGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+`;
+
+const ImageItem = styled.div`
+  position: relative;
+  width: calc(33.33% - 10px); /* Keeps three items per row */
+  padding-top: 40%; /* Further reduce the height by lowering the percentage */
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: ${(props) => (props.isSelected ? '0 4px 12px rgba(0, 123, 255, 0.5)' : '0 4px 8px rgba(0, 0, 0, 0.2)')};
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.7);
+  }
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image fully covers the container */
+    border-radius: 8px;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .image-name {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 5px;
+    text-align: center;
+    border-radius: 4px;
+  }
+
+  ${(props) =>
+    props.isSelected &&
+    `
+      border: 3px solid #007bff;
+      opacity: 0.7;
+    `}
+`;
+
+
+
+const NextButton = styled.button`
+  background-color: #007bff;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    background-color: #0056b3;
+    transform: scale(1.05); /* Slight zoom effect on hover */
+  }
+
+  &:active {
+    background-color: #004085;
+  }
+`;
+
 Modal.setAppElement('#root');
 
 const showErrorToast = (message) => {
@@ -200,11 +294,13 @@ const QuotesPage = () => {
   const [widths, setWidths] = useState([]); 
   const [heights, setHeights] = useState([]); 
   const [productId,setProductID] =useState(null)
+  const [currentStep, setCurrentStep] = useState(1);
   const [possibleLenght,setPossibleLenght] = useState()  
   const [isWidthDisabled, setIsWidthDisabled] = useState(true);
   const [isLenghtDisabled,setIsLenghtDisabled] = useState(true)
   const [isShapeDisabled , setIsShapeDisabled] = useState(true)
   const [CSVQuotation,setCSVQuotation] = useState([])
+  const [selectedImage, setSelectedImage] = useState(null);
   const [newQuote, setNewQuote] = useState({
     product_id: 0,
     height: 0,
@@ -214,6 +310,16 @@ const QuotesPage = () => {
     site_id: 0,
     radius: 60,
   });
+
+  const images =[ 
+    {id:4,src:'/images/image5.jpeg', name: 'Oversize windows ' },
+    {id:6 , src :'/images/image2.jpeg',name: 'Solarium'  },
+    {id :3 , src :'/images/image3.jpeg',name: 'Fire windows' },
+    {id:7 ,src : '/images/image4.jpeg',name: 'Flood Wall'  },
+    {id:5 ,src : '/images/image1.jpeg',name: 'Walkable Skylight' },
+    {id:2 ,src : '/images/image6.jpeg',name: 'Flood windows' },
+  ]
+
 
   const fetchQuotes = async () => {
     try {
@@ -233,6 +339,18 @@ const QuotesPage = () => {
     }
   };
 
+  const handleImageSelect = async (image) => {
+    try {
+      setSelectedImage(image); 
+      const productLengths = await getPossibleLenght(image.id); 
+      setPossibleLenght(productLengths); 
+      setProductID(image.id);
+      setIsLenghtDisabled(false); 
+    } catch (error) {
+      console.error('Error fetching possible lengths:', error);
+    }
+  };
+  
   const fetchSites = async () => {
     try {
       const data = await getSites();
@@ -273,6 +391,10 @@ const QuotesPage = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setSelectedImage(null);
+    setIsLenghtDisabled(true);
+    setIsWidthDisabled(true);
+    setCurrentStep(1)
     setNewQuote({
       product_id: 0,
       height: 0,
@@ -287,9 +409,6 @@ const QuotesPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
-
-    
     if (name === 'shape') {
       if (value === 'Shape') {
         setIsShapeSelected(true);
@@ -334,29 +453,14 @@ const QuotesPage = () => {
     }
   };
   
-  const handleLenghtByProduct = async(e)=>{
-      try{
-        const value = e.target.value
-        setProductID(value)
-        const productlengths = await getPossibleLenght(value)
-        setPossibleLenght(productlengths)
-        setIsLenghtDisabled(false)
-
-        if(value === 'selectproduct'){
-          setProductID(null)
-          setIsLenghtDisabled(true)
-        }
-      }
-      catch (error) {
-        console.error('Error fetching possible lenghts:', error);
-      }
-  }
+  const handleBackStep = () => {
+    setCurrentStep(currentStep - 1);
+  };
 
   useEffect(() => {
     fetchQuotes();
     fetchProducts();
     fetchSites();
-    handleLenghtByProduct()
 
 
   }, []);
@@ -384,6 +488,14 @@ const QuotesPage = () => {
     }
   };
 
+  const handleNextStep = () => {
+    if (selectedImage) {
+      setCurrentStep(2); 
+    } else {
+      alert('Please select an image first!');
+    }
+  };
+
   const handleGetQuoatation=(data)=>{
     setCSVQuotation(data)
   }
@@ -397,15 +509,39 @@ const QuotesPage = () => {
           <AddQuoteButton onClick={handleAddQuote}>Add New Quote</AddQuoteButton>
           
         </HeaderRow>
-        
-
-        {/* Quotes Section */}
+      
         <QuotesWrapper>
           {quotes.map((quote) => (
             <QuoteCard key={quote.id}>
               <p><strong>Product:</strong> {quote.product.product_name}</p>
               <p><strong>Dimensions:</strong> {quote.height} cm x {quote.width} cm</p>
               <p><strong>Quantity:</strong> {quote.quantity}</p>
+              <p><strong>Created At:</strong> {
+                new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Karachi',
+                year: 'numeric',
+                month: 'long',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+                }).format(new Date(quote.created_at)) || 'No Created'
+               }</p>
+            {quote.updated_at ? (
+            <p><strong>Updated At:</strong> {
+             new Intl.DateTimeFormat('en-US', {
+             timeZone: 'Asia/Karachi',
+             year: 'numeric',
+             month: 'long',
+             day: '2-digit',
+             hour: '2-digit',
+             minute: '2-digit',
+             second: '2-digit',
+             hour12: true,
+             }).format(new Date(quote.updated_at))
+            }</p>
+           ) : null}
               <OpenQuoteButton onClick={() => handleOpenQuote(quote.id)}>Open Quote</OpenQuoteButton>
             </QuoteCard>
           ))}
@@ -432,119 +568,133 @@ const QuotesPage = () => {
         contentLabel="Add New Quote"
       >
         <h2>Add New Quote</h2>
-        <form onSubmit={handleSubmit}>
-          <FormContainer>
-            
+          {currentStep === 1 && (
+          <>
+           <FormContainer >
+
+           <h3>Select an Image:</h3>
+            <ImageGrid>
+    {images.map((image) => (
+      <ImageItem
+        key={image.id}
+        isSelected={selectedImage?.id === image.id}
+        onClick={() => handleImageSelect(image)}
+      >
+        <img src={image.src} alt={`Image ${image.id}`} />
+        <div className="image-name">{image.name}</div> 
+      </ImageItem>
+    ))}
+  </ImageGrid>
+  <NextButton onClick={handleNextStep}>Next</NextButton>
+           </FormContainer>
+
+     
+          </>
+        )}
+          {  currentStep === 2 && (
+            <form onSubmit={handleSubmit}>
+<FormContainer>
          
-            <label htmlFor="site_id">Select Site:</label>
-            <Select
-              name="site_id"
-              value={newQuote.site_id}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Select Site</option>
-              {sites.map((site) => (
-                <option key={site.id} value={site.id}>
-                  {site.sitename}
-                </option>
-              ))}
-            </Select>
+<label htmlFor="site_id">Select Site:</label>
+<Select
+  name="site_id"
+  value={newQuote.site_id}
+  onChange={handleInputChange}
+  required
+>
+  <option value="">Select Site</option>
+  {sites.map((site) => (
+    <option key={site.id} value={site.id}>
+      {site.sitename}
+    </option>
+  ))}
+</Select>
 
-            <label htmlFor="product_id">Select Product:</label>
-            <Select
-              name="product_id"
-              value={productId}
-              onChange={handleLenghtByProduct}
-              required
-            >
-              <option value="selectproduct">Select Product</option>
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.product_name}
-                </option>
-              ))}
-            </Select>
 
-            <label htmlFor="shape">Select Design:</label>
-            <Select
-              name="shape"
-              value={newQuote.shape}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="Flat">Flat</option>
-              <option value="Shape">Shape</option>
-              <option value="Round">Round</option>
-            </Select>
 
-                <label htmlFor="custom_shape">Select Custom Shape:</label>
-                <Select
-                  name="custom_shape"
-                  value={newQuote.custom_shape}
-                  onChange={handleInputChange}
-                  disabled={isShapeDisabled}
-                  required
-                >
-                  <option value="">Select Shape</option>
-                  {shapes.map((shape) => (
-                    <option key={shape} value={shape}>
-                      {shape}
-                    </option>
-                  ))}
-                </Select>
-               
-                <label htmlFor="shape_radius">Shape Radius (cm):</label>
-                <Input
-                  type="number"
-                  name="radius"
-                  value={newQuote.radius}
-                  onChange={handleInputChange}
-                  min="60"
-                  required
-                />
-            
-          <label htmlFor="length">Select Height:</label>
-          <Select
-          required
-          disabled={isLenghtDisabled}
-           onChange={handleGetWidthByLenghtChange}
-            >
-           <option value="selectlenght">Select Height</option>
-          {Array.isArray(possibleLenght) && possibleLenght.map((length) => (
-           <option key={length} value={length}>
-             {length} cm
-           </option>
-            ))}
-          </Select>
-        
-          <label htmlFor="lenght">Select Width:</label>
-          <Select
-           name="width"
-           value={newQuote.width}
-           onChange={handleInputChange}
-           disabled={isWidthDisabled} 
-           required
-           >
-          <option value="">Select Width</option>
-            {widths.map((width) => (
-            <option key={width} value={width}>
-            {width} cm
-           </option>
-          ))}
-          </Select>
+<label htmlFor="shape">Select Design:</label>
+<Select
+  name="shape"
+  value={newQuote.shape}
+  onChange={handleInputChange}
+  required
+>
+  <option value="Flat">Flat</option>
+  <option value="Shape">Shape</option>
+  <option value="Round">Round</option>
+</Select>
 
-            <label htmlFor="quantity">Quantity:</label>
-            <Input
-              type="number"
-              name="quantity"
-              value={newQuote.quantity}
-              onChange={handleInputChange}
-              required
-            />
-          </FormContainer>
-          <SubmitButton type="submit">Submit Quote</SubmitButton>
-        </form>
+    <label htmlFor="custom_shape">Select Custom Shape:</label>
+    <Select
+      name="custom_shape"
+      value={newQuote.custom_shape}
+      onChange={handleInputChange}
+      disabled={isShapeDisabled}
+      required
+    >
+      <option value="">Select Shape</option>
+      {shapes.map((shape) => (
+        <option key={shape} value={shape}>
+          {shape}
+        </option>
+      ))}
+    </Select>
+   
+    <label htmlFor="shape_radius">Shape Radius (cm):</label>
+    <Input
+      type="number"
+      name="radius"
+      value={newQuote.radius}
+      onChange={handleInputChange}
+      min="60"
+      required
+    />
+
+    <label htmlFor="length">Select Height:</label>
+    <Select
+    required
+    disabled={isLenghtDisabled}
+    onChange={handleGetWidthByLenghtChange}
+    >
+    <option value="selectlenght">Select Height</option>
+    {Array.isArray(possibleLenght) && possibleLenght.map((length) => (
+   <option key={length} value={length}>
+     {length} cm
+   </option>
+   ))}
+  </Select>
+
+<label htmlFor="lenght">Select Width:</label>
+<Select
+name="width"
+value={newQuote.width}
+onChange={handleInputChange}
+disabled={isWidthDisabled} 
+required
+>
+<option value="">Select Width</option>
+{widths.map((width) => (
+<option key={width} value={width}>
+{width} cm
+</option>
+))}
+</Select>
+
+<label htmlFor="quantity">Quantity:</label>
+<Input
+  type="number"
+  name="quantity"
+  value={newQuote.quantity}
+  onChange={handleInputChange}
+  required
+/>
+<SubmitButton type="submit">Submit Quote</SubmitButton>
+<BackButton onClick={handleBackStep}>Back</BackButton>
+</FormContainer>
+
+
+</form>
+          ) }
       </Modal>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Modal from 'react-modal';
-import { getSites, createSite } from '../../api/api'; 
+import { getSites, createSite ,getQuotationsBySiteId } from '../../api/api'; 
 
 
 const ParentCard = styled.div`
@@ -19,7 +19,7 @@ const ParentCard = styled.div`
 const HeaderRow = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: center; 
   margin-bottom: 20px;
 `;
 
@@ -166,14 +166,40 @@ const customModalStyles = {
   },
 };
 
+const SearchWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+`;
+
+const SearchInput = styled.input`
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 250px;
+
+  @media (max-width: 768px) {
+    width: 100%; 
+    font-size: 14px;
+  }
+`;
+
+
+
 Modal.setAppElement('#root');
 
 const SitesPage = () => {
   const navigate = useNavigate();
   const [sites, setSites] = useState([]);
+  const [siteId, setSitesId] = useState(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filteredSites, setFilteredSites] = useState([]); 
+  const [productNamesBySite, setProductNamesBySite] = useState({});
+  const [quotations,setQuotations] = useState([])
+  const [searchQuery, setSearchQuery] = useState(''); 
   const [newSite, setNewSite] = useState({
     sitename: '',
     site_location: {
@@ -194,6 +220,7 @@ const SitesPage = () => {
     const fetchSites = async () => {
       try {
         const data = await getSites();
+        setFilteredSites(data); 
         setSites(data);
       } catch (err) {
         setError('Failed to load sites');
@@ -253,6 +280,25 @@ const SitesPage = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = sites.filter((site) =>
+      [
+        site.site_location.street,
+        site.site_location.city,
+        site.site_location.state,
+        site.site_location.country,
+        site.site_location.postal_code,
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(query)
+    );
+
+    setFilteredSites(filtered);
+  };
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -273,6 +319,7 @@ const SitesPage = () => {
       console.log(newSiteData); 
       const newsite=await createSite(newSiteData); 
       setSites([...sites, newsite]); 
+      setFilteredSites([...sites, newsite]);
       setNewSite({
         name: '',
         site_location: {
@@ -292,6 +339,30 @@ const SitesPage = () => {
     }
 };
 
+
+useEffect(() => {
+  async function fetchProductNames() {
+    const productsMap = {};
+    for (const site of filteredSites) {
+      try {
+        const response = await getQuotationsBySiteId(site.id);
+        const quotations = Array.isArray(response) ? response : response.data;
+        const productNames = quotations?.map((quotation) => quotation.product.product_name) || [];
+        productsMap[site.id] = productNames.length > 0 ? productNames.join(', ') : 'No products available';
+      } catch (error) {
+        console.error(`Error fetching products for site ${site.id}:`, error);
+        productsMap[site.id] = 'Error fetching products';
+      }
+    }
+    setProductNamesBySite(productsMap);
+  }
+
+  if (filteredSites.length > 0) {
+    fetchProductNames();
+  }
+}, [filteredSites]);
+
+
   if (loading) {
     return <p>Loading sites...</p>;
   }
@@ -303,25 +374,36 @@ const SitesPage = () => {
   return (
     <div style={{ padding: '20px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
       <ParentCard>
-        <HeaderRow>
+      <HeaderRow>
           <SitesLabel>Sites</SitesLabel>
-          <AddSiteButton onClick={handleAddSite}>Add New Site</AddSiteButton>
+          <SearchWrapper>
+            <SearchInput
+              type="text"
+              placeholder="Search by address..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+            <AddSiteButton onClick={handleAddSite}>Add New Site</AddSiteButton>
+          </SearchWrapper>
         </HeaderRow>
 
         <SitesWrapper>
-          {sites.map((site) => (
+          {filteredSites.map((site) => (
             <SiteCard key={site.id}>
-              <h2>{site.sitename || 'No Name'}</h2>
+              <p><strong> Site Id: {site.site_id || 'No Id' }</strong></p>
+              <h2><strong>{site.sitename || 'No Name'}</strong></h2>
               <p>
                 <strong>Address:</strong> {`${site.site_location.street}, ${site.site_location.city}, ${site.site_location.state}, ${site.site_location.country}, ${site.site_location.postal_code}`}
               </p>
               <p><strong>Type:</strong> {site.site_type}</p>
               <p><strong>Risks:</strong> {site.risks.join(', ')}</p>
+              <p> <strong>Products:</strong>
+              {productNamesBySite[site.id] || 'Fetching...'}
+              </p>
               <OpenSiteButton onClick={() => handleOpenSite(site.id)}>Open Site</OpenSiteButton>
             </SiteCard>
           ))}
         </SitesWrapper>
-
         <Modal isOpen={isModalOpen} onRequestClose={handleCloseModal} style={customModalStyles} contentLabel="Add New Site">
           <h2>Add New Site</h2>
           <FormContainer onSubmit={handleSubmit}>
