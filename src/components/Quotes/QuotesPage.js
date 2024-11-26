@@ -64,6 +64,7 @@ const QuoteCard = styled.div`
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  overflow: hidden;
 
 
   &:hover {
