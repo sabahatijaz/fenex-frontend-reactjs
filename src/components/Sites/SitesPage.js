@@ -60,6 +60,7 @@ const SiteCard = styled.div`
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
 
   &:hover {
     transform: translateY(-5px);
@@ -343,7 +344,7 @@ const SitesPage = () => {
 useEffect(() => {
   async function fetchProductNames() {
     const productsMap = {};
-    for (const site of filteredSites) {
+    for (const site of filteredSites) { 
       try {
         const response = await getQuotationsBySiteId(site.id);
         const quotations = Array.isArray(response) ? response : response.data;
@@ -360,7 +361,7 @@ useEffect(() => {
   if (filteredSites.length > 0) {
     fetchProductNames();
   }
-}, [filteredSites]);
+}, [filteredSites]); 
 
 
   if (loading) {
