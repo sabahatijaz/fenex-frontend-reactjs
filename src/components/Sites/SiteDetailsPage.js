@@ -445,6 +445,12 @@ const SiteDetailsPage = () => {
       </Detail>
       <Detail><strong>Type:</strong> {site.site_type}</Detail>
       <Detail><strong>Risks:</strong> {site.risks.join(', ')}</Detail>
+      <Detail>
+      <strong>Total Cost of All Products:</strong> $
+      {quotations
+        .reduce((total, quotation) => total + calculateTotalCost(quotation), 0)
+        .toFixed(2)}
+    </Detail>
 
       <HeaderRow>
         <Title>Quotations</Title>
@@ -527,19 +533,19 @@ const SiteDetailsPage = () => {
               <option value="Round">Round</option>
             </Select>
 
-                <label htmlFor="custom_shape">Select Custom Shape:</label>
-                <Select
-                  name="custom_shape"
-                  value={newQuote.custom_shape}
-                  onChange={handleInputChange}
-                  disabled={isShapeDisabled}
-                  required
-                >
-                  <option value="">Select Shape</option>
-                  {shapes.map((shape) => (
-                    <option key={shape} value={shape}>
-                      {shape}
-                    </option>
+            <label htmlFor="custom_shape">Select Custom Shape:</label>
+              <Select
+                name="custom_shape"
+                value={newQuote.custom_shape}
+                onChange={handleInputChange}
+                disabled={isShapeDisabled}
+                required
+              >
+                <option value="">Select Shape</option>
+                {shapes.map((shape) => (
+                 <option key={shape} value={shape}>
+                  {shape}
+                 </option>
                   ))}
                 </Select>
                

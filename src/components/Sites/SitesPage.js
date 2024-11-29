@@ -52,6 +52,7 @@ const SitesWrapper = styled.div`
 `;
 
 const SiteCard = styled.div`
+  position: relative;
   background: #f4f4f4;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -67,12 +68,39 @@ const SiteCard = styled.div`
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   }
 
+  @media (max-width: 1068px) {
+    width: calc(50% - 20px); 
+    padding: 10px; 
+  }
+
   @media (max-width: 768px) {
-    width: calc(50% - 20px);
+    width: calc(100% - 20px); 
+    padding: 8px; 
   }
 
   @media (max-width: 480px) {
-    width: 100%;
+    width: 100%; 
+    padding: 8px;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1); 
+  }
+
+  .updated-at {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 4px 8px; 
+    border-radius: 4px;
+    font-size: 0.8rem; 
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+
+    @media (max-width: 480px) {
+      font-size: 0.7rem; 
+      padding: 3px 6px; 
+    }
   }
 `;
 
@@ -96,32 +124,30 @@ const OpenSiteButton = styled.button`
 const FormContainer = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 15px; /* Increased gap for better spacing */
-  width: 90%; /* Take 90% of the screen width */
-  max-width: 400px; /* Maximum width for the form */
-  max-height: 70vh; /* Maximum height for the form */
-  overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
-  padding: 15px; /* Added padding */
-  background-color: white; /* Background color to contrast modal */
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Add a shadow for depth */
+  gap: 15px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 15px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 480px) {
-    padding: 10px; /* Reduce padding on smaller screens */
+    padding: 10px;
   }
 `;
-
-
 
 const Input = styled.input`
   padding: 10px;
   font-size: 16px;
   border-radius: 4px;
   border: 1px solid #ccc;
-  width: 100%; /* Full width */
+  width: 100%; 
 
   @media (max-width: 480px) {
-    font-size: 14px; /* Smaller font on mobile */
+    font-size: 14px;
   }
 `;
 
@@ -130,10 +156,10 @@ const Select = styled.select`
   font-size: 16px;
   border-radius: 4px;
   border: 1px solid #ccc;
-  width: 100%; /* Full width */
+  width: 100%; 
 
   @media (max-width: 480px) {
-    font-size: 14px; /* Smaller font on mobile */
+    font-size: 14px;
   }
 `;
 
@@ -352,7 +378,7 @@ useEffect(() => {
         productsMap[site.id] = productNames.length > 0 ? productNames.join(', ') : 'No products available';
       } catch (error) {
         console.error(`Error fetching products for site ${site.id}:`, error);
-        productsMap[site.id] = 'Error fetching products';
+        productsMap[site.id] = 'No Products';
       }
     }
     setProductNamesBySite(productsMap);
@@ -390,19 +416,35 @@ useEffect(() => {
 
         <SitesWrapper>
           {filteredSites.map((site) => (
-            <SiteCard key={site.id}>
-              <p><strong> Site Id: {site.site_id || 'No Id' }</strong></p>
-              <h2><strong>{site.sitename || 'No Name'}</strong></h2>
-              <p>
-                <strong>Address:</strong> {`${site.site_location.street}, ${site.site_location.city}, ${site.site_location.state}, ${site.site_location.country}, ${site.site_location.postal_code}`}
-              </p>
-              <p><strong>Type:</strong> {site.site_type}</p>
-              <p><strong>Risks:</strong> {site.risks.join(', ')}</p>
-              <p> <strong>Products:</strong>
-              {productNamesBySite[site.id] || 'Fetching...'}
-              </p>
-              <OpenSiteButton onClick={() => handleOpenSite(site.id)}>Open Site</OpenSiteButton>
-            </SiteCard>
+           <SiteCard>
+           {site.last_updated && (
+             <div className="updated-at">
+               {
+                 new Intl.DateTimeFormat('en-US', {
+                   timeZone: 'Asia/Karachi',
+                   year: 'numeric',
+                   month: 'long',
+                   day: '2-digit',
+                   hour: '2-digit',
+                   minute: '2-digit',
+                   second: '2-digit',
+                   hour12: true,
+                 }).format(new Date(site.last_updated))
+               }
+             </div>
+           )}
+         
+           <p><strong>Site Id: {site.site_id || 'No Id'}</strong></p>
+           <h2><strong>{site.sitename || 'No Name'}</strong></h2>
+           <p>
+             <strong>Address:</strong> {`${site.site_id} ${site.site_location.street}, ${site.site_location.city}, ${site.site_location.state}, ${site.site_location.country}, ${site.site_location.postal_code}`}
+           </p>
+           <p><strong>Type:</strong> {site.site_type}</p>
+           <p><strong>Risks:</strong> {site.risks.join(', ')}</p>
+           <p><strong>Products:</strong> {productNamesBySite[site.id] || 'Fetching...'}</p>
+           <OpenSiteButton onClick={() => handleOpenSite(site.id)}>Open Site</OpenSiteButton>
+         </SiteCard>
+          
           ))}
         </SitesWrapper>
         <Modal isOpen={isModalOpen} onRequestClose={handleCloseModal} style={customModalStyles} contentLabel="Add New Site">

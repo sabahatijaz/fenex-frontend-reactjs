@@ -63,22 +63,29 @@ const QuoteCard = styled.div`
   width: calc(33.333% - 20px); 
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
-  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
-
 
   &:hover {
     transform: translateY(-5px); 
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
   }
 
+ @media (max-width: 1068px) {
+    width: calc(50% - 20px); 
+    padding: 10px; 
+  }
 
   @media (max-width: 768px) {
-    width: calc(50% - 20px); 
+    width: calc(100% - 20px); 
+    padding: 8px; 
   }
 
   @media (max-width: 480px) {
     width: 100%; 
+    padding: 8px; 
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1); 
+  }
 `;
 
 
